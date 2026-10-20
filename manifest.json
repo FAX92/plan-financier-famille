@@ -1,0 +1,25 @@
+{
+  "name": "Plan de match financier, Québec 2026",
+  "short_name": "Plan financier",
+  "description": "Outil interactif pour bâtir le plan de match financier d’une jeune famille au Québec et générer un PDF personnalisé. Données conservées sur l’appareil.",
+  "lang": "fr-CA",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F4F6F9",
+  "theme_color": "#13213A",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

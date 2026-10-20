@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Plan de match financier | Jeune famille Québec 2026</title>
+<meta name="description" content="Outil interactif et gratuit pour bâtir le plan de match financier d’une jeune famille au Québec : budget, congé parental, comptes enregistrés, dettes, achat immobilier, projections et PDF personnalisé. Vos données restent sur votre appareil.">
+<meta name="theme-color" content="#13213A">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F4F6F9; --card:#FFFFFF; --card-2:#EEF2F7;
+  --ink:#13213A; --ink-2:#4C5A75; --ink-3:#7A869E; --line:#D8DEE8; --line-2:#C5CDDA;
+  --pine:#136F63; --pine-ink:#0C4F46; --pine-soft:#E1F0EC; --pine-glow:rgba(19,111,99,.18);
+  --honey:#B97E00; --honey-soft:#FBF0D3;
+  --rouge:#B3261E; --rouge-soft:#F9E2DF;
+  --sky:#2B63C9; --sky-soft:#E4ECFA;
+  --sans:'Manrope',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r-s:6px; --r-m:12px; --r-l:18px;
+  --shadow:0 1px 2px rgba(19,33,58,.06),0 8px 24px -12px rgba(19,33,58,.18);
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --paper:#0E1522; --card:#161F31; --card-2:#1D2840;
+  --ink:#E9EDF5; --ink-2:#AEB9CE; --ink-3:#7F8BA3; --line:#283552; --line-2:#344466;
+  --pine:#3FBCA8; --pine-ink:#8FE3D4; --pine-soft:#13332F; --pine-glow:rgba(63,188,168,.22);
+  --honey:#E3B64A; --honey-soft:#3A2E10;
+  --rouge:#F27B70; --rouge-soft:#3F1E1B;
+  --sky:#7FA6F0; --sky-soft:#1C2A47;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px -14px rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:calc(72px + var(--safe-t)); -webkit-text-size-adjust:100%}
+html,body{height:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;padding-bottom:var(--safe-b)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:var(--safe-t);background:var(--ink);z-index:40}
+:root[data-theme="dark"] body::before{background:#0A1020}
+h1,h2,h3,h4{margin:0;line-height:1.2;letter-spacing:-.01em}
+h1{font-size:clamp(26px,4vw,34px);font-weight:800}
+h2{font-size:22px;font-weight:800}
+h3{font-size:17px;font-weight:700}
+p{margin:0 0 12px}
+a{color:var(--sky)}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+.num,.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--ink-2)}
+.small{font-size:13px}
+.hidden{display:none!important}
+:focus-visible{outline:3px solid var(--pine);outline-offset:2px;border-radius:4px}
+
+/* Header */
+.topbar{position:sticky;top:0;z-index:30;background:var(--ink);color:#fff;padding-top:var(--safe-t)}
+:root[data-theme="dark"] .topbar{background:#0A1020;border-bottom:1px solid var(--line)}
+.topbar-in{max-width:1380px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:10px 18px;min-height:64px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#1C8F80,#136F63);display:grid;place-items:center;flex:none}
+.brand-mark svg{display:block}
+.brand-text{display:flex;flex-direction:column;min-width:0}
+.brand-text strong{font-size:15px;letter-spacing:.01em;white-space:nowrap}
+.brand-text span{font-size:12px;color:#B9C4D9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-spacer{flex:1}
+.ring-wrap{display:flex;align-items:center;gap:10px}
+.ring{width:44px;height:44px;flex:none}
+.ring circle{fill:none;stroke-width:4}
+.ring .track{stroke:rgba(255,255,255,.18)}
+.ring .bar{stroke:#5CD6C2;stroke-linecap:round;transition:stroke-dashoffset .5s ease}
+.ring-label{display:flex;flex-direction:column;line-height:1.1}
+.ring-label b{font-family:var(--mono);font-size:15px}
+.ring-label span{font-size:11px;color:#B9C4D9}
+.tb-btn{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.tb-btn:hover{background:rgba(255,255,255,.14)}
+.tb-btn svg{width:16px;height:16px}
+.tb-btn .lbl{display:inline}
+@media (max-width:760px){.tb-btn .lbl{display:none}.tb-btn{padding:8px 10px}.brand-text span{display:none}}
+
+/* Layout */
+.shell{max-width:1380px;margin:0 auto;display:grid;grid-template-columns:232px minmax(0,1fr) 320px;gap:24px;padding:22px 18px 80px}
+@media (max-width:1180px){.shell{grid-template-columns:212px minmax(0,1fr);}}
+@media (max-width:760px){.shell{grid-template-columns:1fr;gap:14px;padding:12px 12px 80px}}
+
+/* Rail */
+.rail{position:sticky;top:calc(80px + var(--safe-t));align-self:start;min-width:0}
+.shell>*{min-width:0}
+.rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.rail li button{width:100%;text-align:left;background:transparent;border:0;border-radius:10px;padding:9px 10px;display:flex;align-items:center;gap:10px;color:var(--ink-2);font-weight:600;font-size:14px}
+.rail li button:hover{background:var(--card)}
+.rail li button[aria-current="step"]{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line-2);display:grid;place-items:center;font-size:11px;font-family:var(--mono);color:var(--ink-3);flex:none;background:var(--card)}
+.dot.partial{border-color:var(--honey);color:var(--honey)}
+.dot.done{border-color:var(--pine);background:var(--pine);color:#fff}
+.dot.done::after{content:"✓";font-size:12px}
+.dot.done span{display:none}
+.rail-foot{margin-top:14px;padding:12px;border-radius:12px;background:var(--pine-soft);color:var(--pine-ink);font-size:13px}
+:root[data-theme="dark"] .rail-foot{color:var(--pine-ink)}
+@media (max-width:760px){
+  .rail{position:sticky;top:calc(64px + var(--safe-t));z-index:20;background:var(--paper);padding:6px 0 8px;margin:0 -12px;padding-left:12px}
+  .rail ol{flex-direction:row;overflow-x:auto;scrollbar-width:none;padding-right:12px;gap:6px;max-width:100%}
+  .rail ol::-webkit-scrollbar{display:none}
+  .rail li{flex:none}
+  .rail li button{padding:7px 10px 7px 7px;border:1px solid var(--line);background:var(--card);border-radius:999px;font-size:13px}
+  .rail li button[aria-current="step"]{border-color:var(--pine);box-shadow:none}
+  .rail-foot{display:none}
+}
+
+/* Main */
+.main{min-width:0}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r-l);box-shadow:var(--shadow);padding:26px 28px}
+@media (max-width:760px){.panel{padding:18px 16px;border-radius:14px}}
+.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:6px}
+.step-kicker{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin-bottom:6px}
+.panel-head .state{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--card-2);color:var(--ink-2);white-space:nowrap;margin-top:4px}
+.panel-head .state.done{background:var(--pine-soft);color:var(--pine-ink)}
+.panel-head .state.partial{background:var(--honey-soft);color:var(--honey)}
+.intro{color:var(--ink-2);margin:6px 0 22px;max-width:62ch}
+.fieldset{border:0;margin:0 0 22px;padding:0}
+.fieldset > legend{font-weight:800;font-size:15px;padding:0;margin:0 0 4px}
+.fieldset .lead{color:var(--ink-2);font-size:14px;margin:0 0 12px;max-width:60ch}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px}
+.grid .span2{grid-column:1/-1}
+@media (max-width:620px){.grid{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label{font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px}
+.field label .req{color:var(--rouge);font-weight:800}
+.field .help{font-size:12.5px;color:var(--ink-3);line-height:1.4}
+.control{position:relative;display:flex;align-items:center}
+.control input,.control select,.control textarea{width:100%;border:1.5px solid var(--line-2);background:var(--card);border-radius:10px;padding:10px 12px;font-size:15px;min-height:44px;color:var(--ink);transition:border-color .15s,box-shadow .15s}
+.control input[inputmode="decimal"],.control input[type="number"]{font-family:var(--mono);text-align:right;padding-right:34px}
+.control .unit{position:absolute;right:12px;color:var(--ink-3);font-size:14px;pointer-events:none;font-family:var(--mono)}
+.control input:focus,.control select:focus,.control textarea:focus{outline:none;border-color:var(--pine);box-shadow:0 0 0 4px var(--pine-glow)}
+.control textarea{min-height:88px;resize:vertical;font-family:var(--sans)}
+.field.missing .control input,.field.missing .control select,.field.missing .control textarea{border-color:var(--honey)}
+.field.filled label .req{color:var(--pine)}
+.check{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid var(--line-2);border-radius:10px;background:var(--card);min-height:44px}
+.check input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--pine);flex:none}
+.check label{font-weight:600;font-size:14px;cursor:pointer}
+.estimate{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px;padding:10px 12px;border-radius:10px;background:var(--card-2);font-size:13.5px;color:var(--ink-2)}
+.estimate b{font-family:var(--mono);color:var(--ink);font-size:15px}
+.estimate button{border:1px solid var(--line-2);background:var(--card);border-radius:8px;padding:4px 10px;font-size:12.5px;font-weight:700;color:var(--pine-ink)}
+.note{border-left:3px solid var(--pine);background:var(--pine-soft);color:var(--pine-ink);padding:10px 14px;border-radius:0 10px 10px 0;font-size:14px;margin:0 0 18px}
+.note.warn{border-color:var(--honey);background:var(--honey-soft);color:var(--ink)}
+.note.alert{border-color:var(--rouge);background:var(--rouge-soft);color:var(--ink)}
+.note p:last-child{margin-bottom:0}
+.live{margin-top:18px;border:1px dashed var(--line-2);border-radius:14px;padding:14px 16px;background:var(--card-2)}
+.live h3{font-size:14px;color:var(--ink-2);margin-bottom:10px;font-weight:700}
+.live-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 16px}
+.live-grid div{display:flex;flex-direction:column;gap:2px}
+.live-grid span{font-size:12px;color:var(--ink-3)}
+.live-grid b{font-family:var(--mono);font-size:17px;font-weight:600}
+.live table{width:100%;border-collapse:collapse;font-size:13.5px}
+.live td{padding:5px 0;border-bottom:1px solid var(--line)}
+.live td:last-child{text-align:right;font-family:var(--mono)}
+.live tr:last-child td{border-bottom:0}
+.live-chart svg{width:100%;height:auto;display:block}
+.panel-foot{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin-top:26px;padding-top:18px;border-top:1px solid var(--line)}
+.btn{border:1.5px solid var(--line-2);background:var(--card);color:var(--ink);border-radius:12px;padding:11px 16px;font-weight:700;font-size:14.5px;display:inline-flex;align-items:center;gap:8px;min-height:44px;transition:transform .08s ease,background .15s}
+.btn:hover{background:var(--card-2)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--pine);border-color:var(--pine);color:#fff}
+.btn.primary:hover{background:var(--pine-ink);border-color:var(--pine-ink)}
+:root[data-theme="dark"] .btn.primary{color:#07211D}
+:root[data-theme="dark"] .btn.primary:hover{background:var(--pine-ink)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--ink-2)}
+.btn.ghost:hover{background:var(--card-2)}
+.btn.danger{color:var(--rouge);border-color:var(--rouge-soft)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.btn svg{width:18px;height:18px}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px}
+.zero-btn{font-size:12.5px;font-weight:700;color:var(--ink-2);background:transparent;border:1px solid var(--line-2);border-radius:8px;padding:5px 10px}
+
+/* Dashboard */
+.dash{position:sticky;top:calc(80px + var(--safe-t));align-self:start;display:flex;flex-direction:column;gap:14px}
+.dash-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-l);box-shadow:var(--shadow);padding:16px 18px}
+.dash-card h3{font-size:13px;color:var(--ink-2);font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px}
+.kpi span{display:block;font-size:12px;color:var(--ink-3)}
+.kpi b{display:block;font-family:var(--mono);font-size:19px;font-weight:600;line-height:1.2;margin-top:2px}
+.kpi small{display:block;font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.lights{display:flex;flex-direction:column;gap:8px}
+.light{display:flex;align-items:center;gap:10px;font-size:13.5px}
+.light i{width:12px;height:12px;border-radius:50%;flex:none;box-shadow:0 0 0 3px var(--card-2)}
+.light.g i{background:#1DA383}.light.y i{background:#E0A526}.light.r i{background:#D9463B}.light.n i{background:var(--line-2)}
+.light span{flex:1}
+.light b{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--ink-2)}
+.prio{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+.prio li{display:flex;gap:10px;font-size:13.5px;line-height:1.4}
+.prio li em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--pine);font-weight:700;margin-top:2px}
+.prio-empty{font-size:13.5px;color:var(--ink-3)}
+.dash .btn{width:100%;justify-content:center}
+
+/* Drawers (dashboard mobile + parameters) */
+.drawer{position:fixed;inset:0;z-index:50;display:none}
+.drawer.open{display:block}
+.drawer-bg{position:absolute;inset:0;background:rgba(10,16,32,.55)}
+.drawer-panel{position:absolute;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--paper);overflow:auto;padding:calc(16px + var(--safe-t)) 16px calc(20px + var(--safe-b));display:flex;flex-direction:column;gap:14px;box-shadow:-10px 0 40px rgba(0,0,0,.25)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.drawer-head h2{font-size:18px}
+.drawer-head button{background:var(--card);border:1px solid var(--line);border-radius:10px;width:40px;height:40px;display:grid;place-items:center}
+.params-group{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.params-group h3{font-size:14px;margin-bottom:10px}
+.params-group .grid{gap:10px 12px}
+.params-group .field label{font-size:13px}
+.params-group .control input{min-height:38px;padding:7px 28px 7px 10px;font-size:13.5px}
+.params-src{font-size:12px;color:var(--ink-3);margin-top:8px}
+
+/* Generation step */
+.gen-hero{display:flex;flex-wrap:wrap;gap:22px;align-items:center;margin-bottom:18px}
+.gen-ring{width:132px;height:132px;position:relative;flex:none}
+.gen-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.gen-ring circle{fill:none;stroke-width:9}
+.gen-ring .track{stroke:var(--card-2)}
+.gen-ring .bar{stroke:var(--pine);stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+.gen-ring .val{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);font-size:26px;font-weight:700}
+.gen-text{flex:1;min-width:220px}
+.gen-text h2{margin-bottom:6px}
+.missing-list{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.missing-list li button{background:var(--honey-soft);border:1px solid transparent;color:var(--ink);border-radius:8px;padding:6px 10px;font-size:13px;text-align:left;width:100%;display:flex;justify-content:space-between;gap:8px}
+.missing-list li button:hover{border-color:var(--honey)}
+.missing-more{font-size:13px;color:var(--ink-3)}
+.gen-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:620px){.gen-actions{grid-template-columns:1fr}}
+.gen-actions .btn{justify-content:center;min-height:52px}
+.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:18px}
+.tools .btn{justify-content:center}
+.status{min-height:22px;font-size:14px;margin-top:12px}
+.status.ok{color:var(--pine-ink)}
+.status.err{color:var(--rouge)}
+pre.mandate{white-space:pre-wrap;font-family:var(--sans);font-size:13.5px;background:var(--card-2);padding:14px;border-radius:12px;max-height:260px;overflow:auto;border:1px solid var(--line)}
+
+/* Toast */
+.toast{position:fixed;left:50%;bottom:calc(22px + var(--safe-b));transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:60;max-width:92vw;text-align:center}
+:root[data-theme="dark"] .toast{background:#fff;color:#0E1522}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Welcome */
+.welcome-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:18px 0 6px}
+.welcome-grid div{background:var(--card-2);border-radius:14px;padding:14px 16px}
+.welcome-grid b{display:block;margin-bottom:4px;font-size:14.5px}
+.welcome-grid p{font-size:13.5px;color:var(--ink-2);margin:0}
+.steps-list{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:8px}
+.steps-list li{display:flex;gap:12px;align-items:flex-start;font-size:14px}
+.steps-list li .dot{margin-top:1px}
+.steps-list li span.s{color:var(--ink-2)}
+
+@media (max-width:1180px){.dash{display:none}}
+@media (max-width:760px){.brand{flex:1;min-width:0}.brand-text strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}.topbar-spacer{display:none}.ring{width:34px;height:34px}.ring-label{display:none}.topbar-in{gap:8px;padding:8px 12px;min-height:56px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media print{
+  .topbar,.rail,.dash,.panel-foot,.btn,.drawer,.toast{display:none!important}
+  .shell{display:block;padding:0}
+  .panel{box-shadow:none;border:0}
+  body{background:#fff;color:#000}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 15l4-6 3 4 5-7"/></svg>
+      </div>
+      <div class="brand-text">
+        <strong>Plan de match financier</strong>
+        <span>Jeune famille, Québec 2026</span>
+      </div>
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="ring-wrap" title="Progression du questionnaire">
+      <svg class="ring" viewBox="0 0 44 44" aria-hidden="true">
+        <circle class="track" cx="22" cy="22" r="18"></circle>
+        <circle class="bar" id="ringBar" cx="22" cy="22" r="18" stroke-dasharray="113.1" stroke-dashoffset="113.1" transform="rotate(-90 22 22)"></circle>
+      </svg>
+      <div class="ring-label"><b id="ringPct">0 %</b><span>complété</span></div>
+    </div>
+    <button class="tb-btn" id="btnParams" type="button" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><path d="M12 8v4l3 2"/></svg>
+      <span class="lbl">Paramètres 2026</span>
+    </button>
+    <button class="tb-btn" id="btnTheme" type="button" aria-label="Changer le thème">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <span class="lbl">Thème</span>
+    </button>
+    <button class="tb-btn" id="btnDash" type="button" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      <span class="lbl">Tableau de bord</span>
+    </button>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" aria-label="Étapes du questionnaire">
+    <ol id="rail"></ol>
+    <div class="rail-foot">Vos réponses sont enregistrées automatiquement sur cet appareil seulement. Rien n’est envoyé sur un serveur.</div>
+  </nav>
+
+  <main class="main" id="main">
+    <section class="panel" id="panel" aria-live="polite"></section>
+  </main>
+
+  <aside class="dash" id="dash" aria-label="Tableau de bord"></aside>
+</div>
+
+<div class="drawer" id="dashDrawer" role="dialog" aria-modal="true" aria-label="Tableau de bord">
+  <div class="drawer-bg" data-close="dashDrawer"></div>
+  <div class="drawer-panel">
+    <div class="drawer-head"><h2>Tableau de bord</h2><button type="button" data-close="dashDrawer" aria-label="Fermer">✕</button></div>
+    <div id="dashMobile"></div>
+  </div>
+</div>
+
+<div class="drawer" id="paramsDrawer" role="dialog" aria-modal="true" aria-label="Paramètres 2026">
+  <div class="drawer-bg" data-close="paramsDrawer"></div>
+  <div class="drawer-panel">
+    <div class="drawer-head"><h2>Paramètres 2026</h2><button type="button" data-close="paramsDrawer" aria-label="Fermer">✕</button></div>
+    <p class="small muted">Valeurs officielles vérifiées en octobre 2026. Elles servent aux estimations de l’outil et sont modifiables si une règle change. Le bouton de réinitialisation ramène les valeurs par défaut.</p>
+    <div id="paramsBody"></div>
+    <div class="btn-row"><button class="btn" type="button" id="btnParamsReset">Réinitialiser les valeurs 2026</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.21/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.21/vfs_fonts.js"></script>
+<script>
+/* =====================================================================
+   Plan de match financier | Jeune famille Québec 2026
+   Application autonome : aucune donnée ne quitte l’appareil.
+   ===================================================================== */
+'use strict';
+
+/* ---------- Paramètres 2026 (vérifiés octobre 2026, modifiables) ---------- */
+const PARAM_GROUPS = [
+  { id:'comptes', title:'Comptes enregistrés', src:'ARC (plafonds 2026), Revenu Québec', fields:[
+    ['celiPlafond','Plafond CELI 2026',7000,'$'],['celiCumul','Droits CELI cumulés depuis 2009',109000,'$'],
+    ['reerPlafond','Plafond REER 2026',33810,'$'],['reerTaux','REER : % du revenu gagné',18,'%'],
+    ['celiappAnnuel','CELIAPP : plafond annuel',8000,'$'],['celiappVie','CELIAPP : plafond à vie',40000,'$'],['celiappReport','CELIAPP : report maximal',8000,'$'],
+    ['rapMax','RAP : retrait maximal',60000,'$'],
+    ['reeeRepere','REEE : cotisation repère par enfant',2500,'$'],['sceeTaux','SCEE : taux de base',20,'%'],['sceeVie','SCEE : plafond à vie',7200,'$'],
+    ['iqeeTaux','IQEE : taux de base',10,'%'],['iqeeVie','IQEE : plafond à vie',3600,'$'],['reeeVie','REEE : cotisations à vie',50000,'$']
+  ]},
+  { id:'rqap', title:'RQAP et cotisations sociales', src:'RQAP, Retraite Québec, Service Canada (2026)', fields:[
+    ['rqapMRA','RQAP : revenu maximal assurable',103000,'$'],['rqapCot','RQAP : cotisation employé',0.430,'%'],
+    ['rqapBaseHaut','Régime de base : taux élevé',70,'%'],['rqapBaseBas','Régime de base : taux réduit',55,'%'],['rqapPart','Régime particulier : taux',75,'%'],
+    ['rqapMatBase','Base : semaines de maternité',18,'sem.'],['rqapPatBase','Base : semaines de paternité',5,'sem.'],['rqapPar70','Base : semaines parentales à 70 %',7,'sem.'],['rqapPar55','Base : semaines parentales à 55 %',25,'sem.'],['rqapBonusBase','Base : semaines bonus partageables',4,'sem.'],
+    ['rqapMatPart','Particulier : semaines de maternité',15,'sem.'],['rqapPatPart','Particulier : semaines de paternité',3,'sem.'],['rqapParPart','Particulier : semaines parentales',25,'sem.'],['rqapBonusPart','Particulier : semaines bonus',3,'sem.'],
+    ['rrqMGA','RRQ : maximum des gains admissibles',74600,'$'],['rrqMSGA','RRQ : maximum supplémentaire',85000,'$'],['rrqExemption','RRQ : exemption de base',3500,'$'],
+    ['rrqBase','RRQ : taux de base',5.3,'%'],['rrqSupp1','RRQ : première cotisation supplémentaire',1.0,'%'],['rrqSupp2','RRQ : deuxième cotisation supplémentaire',4,'%'],
+    ['aeTaux','Assurance-emploi : taux (Québec)',1.30,'%'],['aeMRA','Assurance-emploi : maximum assurable',68900,'$']
+  ]},
+  { id:'impot', title:'Impôt sur le revenu 2026', src:'ARC T4032-QC, Finances Québec (indexation 2,05 %)', fields:[
+    ['fedB1','Fédéral : fin du palier 1',58523,'$'],['fedB2','Fédéral : fin du palier 2',117045,'$'],['fedB3','Fédéral : fin du palier 3',181440,'$'],['fedB4','Fédéral : fin du palier 4',258482,'$'],
+    ['fedR1','Fédéral : taux 1',14,'%'],['fedR2','Fédéral : taux 2',20.5,'%'],['fedR3','Fédéral : taux 3',26,'%'],['fedR4','Fédéral : taux 4',29,'%'],['fedR5','Fédéral : taux 5',33,'%'],
+    ['fedBPA','Fédéral : montant personnel de base',16452,'$'],['fedBPAmin','Fédéral : MPB minimal (hauts revenus)',14829,'$'],['fedAbat','Abattement du Québec',16.5,'%'],['fedEmploi','Montant canadien pour emploi',1501,'$'],
+    ['qcB1','Québec : fin du palier 1',54345,'$'],['qcB2','Québec : fin du palier 2',108680,'$'],['qcB3','Québec : fin du palier 3',132245,'$'],
+    ['qcR1','Québec : taux 1',14,'%'],['qcR2','Québec : taux 2',19,'%'],['qcR3','Québec : taux 3',24,'%'],['qcR4','Québec : taux 4',25.75,'%'],
+    ['qcBPA','Québec : montant personnel de base',18952,'$'],['qcTravailleur','Québec : déduction pour travailleurs (max.)',1450,'$']
+  ]},
+  { id:'alloc', title:'Allocations familiales', src:'ARC (ACE juillet 2026 à juin 2027), Retraite Québec (2026)', fields:[
+    ['aceMoins6','ACE : maximum, enfant de moins de 6 ans',8157,'$'],['ace6a17','ACE : maximum, 6 à 17 ans',6883,'$'],['aceS1','ACE : premier seuil de revenu',38237,'$'],['aceS2','ACE : deuxième seuil de revenu',82847,'$'],
+    ['aceT1_1','ACE : réduction 1 enfant (phase 1)',7,'%'],['aceT2_1','ACE : réduction 1 enfant (phase 2)',3.2,'%'],['aceT1_2','ACE : réduction 2 enfants (phase 1)',13.5,'%'],['aceT2_2','ACE : réduction 2 enfants (phase 2)',5.7,'%'],
+    ['aceT1_3','ACE : réduction 3 enfants (phase 1)',19,'%'],['aceT2_3','ACE : réduction 3 enfants (phase 2)',8,'%'],['aceT1_4','ACE : réduction 4 enfants et plus (phase 1)',23,'%'],['aceT2_4','ACE : réduction 4 enfants et plus (phase 2)',9.5,'%'],
+    ['afMax','Allocation famille : maximum par enfant',3068,'$'],['afMin','Allocation famille : minimum par enfant',1221,'$'],['afSeuilCouple','Allocation famille : seuil de réduction, couple (estimé)',60690,'$'],['afSeuilMono','Allocation famille : seuil, famille monoparentale (estimé)',44225,'$'],['afTaux','Allocation famille : taux de réduction',4,'%'],
+    ['afMonoMax','Supplément monoparental : maximum (estimé)',1098,'$'],['afMonoMin','Supplément monoparental : minimum',430,'$'],
+    ['garderieCPE','Contribution réduite en garderie (par jour)',9.65,'$'],['creditGarde','Crédit d’impôt Québec pour frais de garde (taux estimé)',67,'%']
+  ]},
+  { id:'immo', title:'Immobilier', src:'Loi sur les droits de mutation (2026), SCHL, BSIF', fields:[
+    ['dmT1','Droits de mutation : fin de la tranche 1',62900,'$'],['dmT2','Droits de mutation : fin de la tranche 2',315000,'$'],['dmR1','Taux tranche 1',0.5,'%'],['dmR2','Taux tranche 2',1,'%'],['dmR3','Taux tranche 3',1.5,'%'],
+    ['dmSeuilMun','Tranche municipale additionnelle à partir de',500000,'$'],['dmTauxMun','Taux municipal additionnel (0 si inconnu)',0,'%'],['dmCredit','Crédit Québec premier acheteur sur droits de mutation (annoncé 2026, à valider)',5000,'$'],
+    ['cahpFed','Crédit fédéral premier acheteur (CIAPH)',1500,'$'],['cahpQc','Crédit Québec premier acheteur (estimé)',1400,'$'],
+    ['schl5','Prime SCHL : mise de fonds de 5 à 9,99 %',4.00,'%'],['schl10','Prime SCHL : 10 à 14,99 %',3.10,'%'],['schl15','Prime SCHL : 15 à 19,99 %',2.80,'%'],['tvqPrime','TVQ sur la prime d’assurance prêt',9.975,'%'],
+    ['qualifPlancher','Taux de qualification plancher',5.25,'%'],['qualifEcart','Écart ajouté au taux contractuel',2,'%'],['gdsMax','Ratio ABD maximal (logement)',39,'%'],['tdsMax','Ratio ATD maximal (total)',44,'%'],['chauffage','Chauffage mensuel présumé (qualification)',150,'$'],
+    ['notaire','Honoraires du notaire (estimé)',1800,'$'],['inspection','Inspection préachat (estimé)',650,'$'],['demenagement','Déménagement et ajustements (estimé)',1500,'$'],['fraisVente','Frais de vente futurs (courtier, notaire)',5,'%']
+  ]},
+  { id:'hyp', title:'Hypothèses générales', src:'Hypothèses de planification, à ajuster selon votre profil', fields:[
+    ['inflation','Inflation annuelle',2.0,'%'],['tauxCarte','Taux présumé des cartes de crédit',20.99,'%'],['tauxMarge','Taux présumé marge de crédit (si vide)',8.5,'%'],['multAssVie','Multiple de revenu pour le besoin d’assurance vie',10,'x']
+  ]}
+];
+const P = {};
+const P_DEFAULT = {};
+PARAM_GROUPS.forEach(g=>g.fields.forEach(f=>{P[f[0]]=f[2];P_DEFAULT[f[0]]=f[2];}));
+
+/* ---------- Utilitaires ---------- */
+const NBSP='\u00A0', NNBSP='\u202F';
+const fmtMoney = (n,dec=0)=>{ if(n===null||n===undefined||isNaN(n)) return '—'; const s=Math.abs(n).toLocaleString('fr-CA',{minimumFractionDigits:dec,maximumFractionDigits:dec}); return (n<0?'-':'')+s.replace(/\s/g,NNBSP)+NNBSP+'$'; };
+const fmtPct = (n,dec=1)=> (n===null||n===undefined||isNaN(n))?'—':n.toLocaleString('fr-CA',{minimumFractionDigits:dec,maximumFractionDigits:dec})+NNBSP+'%';
+const fmtNum = (n,dec=0)=> (n===null||n===undefined||isNaN(n))?'—':n.toLocaleString('fr-CA',{minimumFractionDigits:dec,maximumFractionDigits:dec}).replace(/\s/g,NNBSP);
+const num = v => { if(v===''||v===null||v===undefined) return 0; const n=parseFloat(String(v).replace(/\s/g,'').replace(',','.')); return isNaN(n)?0:n; };
+const has = v => !(v===''||v===null||v===undefined);
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const todayISO = ()=>new Date().toISOString().slice(0,10);
+const dateFR = (d=new Date())=>d.toLocaleDateString('fr-CA',{year:'numeric',month:'long',day:'numeric'});
+
+/* ---------- Schéma du questionnaire ---------- */
+const isCouple = S => S.statut!=='Parent seul';
+const isFait = S => S.statut==='Conjoints de fait';
+const hasKids = S => (num(S.enfantsMoins6)+num(S.enfants6a17))>0;
+const hasConge = S => S.conge==='Congé parental en cours ou prévu dans les 12 mois';
+const buys = S => has(S.horizonAchat) && S.horizonAchat!=='Pas d’achat prévu';
+const OUI_NON_VERIF=['Oui','Non','À vérifier'];
+
+const SECTIONS = [
+  { id:'depart', title:'Point de départ', short:'Départ', custom:'welcome' },
+  { id:'famille', title:'Fiche familiale et revenus', short:'Famille',
+    intro:'Le portrait de base : qui compose le ménage, les revenus d’emploi et le congé parental. Ces réponses alimentent toutes les estimations suivantes.',
+    groups:[
+      { legend:'Le ménage', fields:[
+        {k:'planName',l:'Nom du plan',t:'text',r:false,h:'Apparaît sur la page couverture du PDF, par exemple « Plan famille 2026 ».',span2:true},
+        {k:'statut',l:'Situation conjugale',t:'select',o:['Mariés ou unis civilement','Conjoints de fait','Parent seul'],h:'Au Québec, le statut change les règles de partage, de succession et de protection de la résidence.'},
+        {k:'logement',l:'Logement actuel',t:'select',o:['Locataire','Propriétaire','Hébergé ou autre']},
+        {k:'prenomA',l:'Parent A (prénom ou initiale)',t:'text',r:false,h:'Parent A : la personne qui accouche s’il y a un congé de maternité.'},
+        {k:'prenomB',l:'Parent B (prénom ou initiale)',t:'text',r:false,showIf:isCouple},
+        {k:'ageA',l:'Âge du parent A',t:'int',min:16,max:80},
+        {k:'ageB',l:'Âge du parent B',t:'int',min:16,max:80,showIf:isCouple},
+        {k:'enfantsMoins6',l:'Enfants de moins de 6 ans',t:'int',min:0,max:8,h:'Incluez un bébé attendu dans l’année.'},
+        {k:'enfants6a17',l:'Enfants de 6 à 17 ans',t:'int',min:0,max:8}
+      ]},
+      { legend:'Revenus d’emploi', lead:'Salaire brut annuel avant retenues. L’outil estime le net après impôt fédéral et québécois, RRQ, assurance-emploi et RQAP (2026).', fields:[
+        {k:'revenuA',l:'Revenu brut annuel, parent A',t:'money'},
+        {k:'revenuB',l:'Revenu brut annuel, parent B',t:'money',showIf:isCouple},
+        {k:'regimeA',l:'Régime de retraite de l’employeur, parent A',t:'select',o:['Aucun','Cotisations déterminées (RCD)','Prestations déterminées (RPD)','REER collectif ou RVER'],h:'Un régime d’employeur réduit les droits REER par le facteur d’équivalence (FE).'},
+        {k:'regimeB',l:'Régime de retraite de l’employeur, parent B',t:'select',o:['Aucun','Cotisations déterminées (RCD)','Prestations déterminées (RPD)','REER collectif ou RVER'],showIf:isCouple}
+      ]},
+      { legend:'Congé parental (RQAP)', lead:'Les prestations sont imposables et plafonnées au revenu maximal assurable (103 000 $ en 2026). L’outil répartit les semaines selon le régime choisi.', fields:[
+        {k:'conge',l:'Congé parental',t:'select',o:['Aucun congé parental en vue','Congé parental en cours ou prévu dans les 12 mois']},
+        {k:'rqapRegime',l:'Régime RQAP',t:'select',o:['Régime de base','Régime particulier'],showIf:hasConge,h:'Base : plus long, 70 % puis 55 %. Particulier : plus court, 75 %.'},
+        {k:'semainesA',l:'Semaines de prestations, parent A (maternité + parentales)',t:'int',min:0,max:60,showIf:hasConge},
+        {k:'semainesB',l:'Semaines de prestations, parent B (paternité + parentales)',t:'int',min:0,max:60,showIf:S=>hasConge(S)&&isCouple(S)},
+        {k:'topupPct',l:'Complément de salaire versé par l’employeur',t:'pct',min:0,max:100,showIf:hasConge,h:'En % du salaire, pour le parent A. Inscrivez 0 s’il n’y en a pas.'},
+        {k:'topupSemaines',l:'Durée du complément (semaines)',t:'int',min:0,max:60,showIf:hasConge}
+      ]},
+      { legend:'Cap du plan', fields:[
+        {k:'objectif',l:'Objectif financier principal',t:'select',o:['Bâtir le fonds d’urgence','Acheter une première propriété','Réduire les dettes','Maximiser les comptes enregistrés','Préparer la retraite','Augmenter les revenus du ménage']},
+        {k:'horizonAchat',l:'Achat immobilier envisagé',t:'select',o:['Pas d’achat prévu','Dans moins de 2 ans','Dans 2 à 5 ans','Dans plus de 5 ans']},
+        {k:'commentaires',l:'Changements attendus dans les 12 mois',t:'textarea',r:false,h:'Déménagement, retour au travail, deuxième enfant, changement d’emploi.',span2:true}
+      ]}
+    ]},
+  { id:'budget', title:'Budget mensuel', short:'Budget',
+    intro:'Le budget réel, pas le budget idéal. Les montants annuels se divisent par 12; les paiements aux deux semaines se multiplient par 26 puis se divisent par 12.',
+    groups:[
+      { legend:'Dépenses mensuelles', fields:[
+        {k:'loyer',l:'Loyer ou paiement hypothécaire',t:'money'},
+        {k:'energie',l:'Électricité et chauffage',t:'money'},
+        {k:'epicerie',l:'Épicerie et produits ménagers',t:'money'},
+        {k:'transport',l:'Transport : essence, stationnement, transport en commun',t:'money'},
+        {k:'autoPaiement',l:'Paiements automobile (mensualisés)',t:'money'},
+        {k:'assurances',l:'Assurances auto et habitation',t:'money'},
+        {k:'telecom',l:'Télécom et abonnements',t:'money'},
+        {k:'garde',l:'Frais de garde, actuels ou prévus',t:'money'},
+        {k:'bebe',l:'Bébé, pharmacie, vêtements',t:'money'},
+        {k:'loisirs',l:'Restaurants, loisirs, divers',t:'money'},
+        {k:'autresDettesPaiement',l:'Autres remboursements de dettes (cartes, marge, prêts)',t:'money'},
+        {k:'autresDepenses',l:'Autres dépenses lissées (dons, voyages, imprévus)',t:'money'},
+        {k:'epargneActuelle',l:'Épargne mensuelle actuelle, toutes cotisations incluses',t:'money',span2:true}
+      ]},
+      { legend:'Garderie', lead:'Une place subventionnée coûte 9,65 $ par jour en 2026. En garderie non subventionnée, le crédit d’impôt du Québec rembourse une partie importante des frais; l’outil estime le coût net.', fields:[
+        {k:'garderieType',l:'Mode de garde prévu',t:'select',o:['Pas de garderie pour l’instant','Place subventionnée (CPE, milieu familial, garderie subventionnée)','Garderie non subventionnée','Autre arrangement (famille, nounou)']},
+        {k:'garderieTarif',l:'Tarif quotidien de la garderie non subventionnée',t:'money',showIf:S=>S.garderieType==='Garderie non subventionnée'},
+        {k:'garderieInscrit',l:'Enfant inscrit au guichet unique des services de garde',t:'select',o:['Oui','Non','Pas encore d’enfant'],h:'Le Portail d’inscription (anciennement La Place 0-5) : s’inscrire dès la naissance, les délais dépassent souvent un an.'}
+      ]},
+      { legend:'Revenu net et allocations réels (facultatif)', lead:'Laissez vide pour utiliser les estimations de l’outil. Inscrivez vos chiffres réels si vous les connaissez : ils remplaceront les estimations partout.', fields:[
+        {k:'revenuNetReel',l:'Revenu net mensuel réel du ménage (talons de paie)',t:'money',r:false},
+        {k:'allocationsReelles',l:'Allocations familiales réellement reçues par mois',t:'money',r:false}
+      ]}
+    ]},
+  { id:'bilan', title:'Actifs et passifs', short:'Bilan',
+    intro:'Ce que vous possédez et ce que vous devez, aujourd’hui. Les soldes approximatifs suffisent; l’important est d’avoir une photo complète.',
+    groups:[
+      { legend:'Actifs', fields:[
+        {k:'comptes',l:'Comptes chèques et épargne (liquidités)',t:'money'},
+        {k:'celiA',l:'CELI, parent A',t:'money'},{k:'celiB',l:'CELI, parent B',t:'money',showIf:isCouple},
+        {k:'celiappA',l:'CELIAPP, parent A',t:'money'},{k:'celiappB',l:'CELIAPP, parent B',t:'money',showIf:isCouple},
+        {k:'reerA',l:'REER, parent A (incluant REER collectif)',t:'money'},{k:'reerB',l:'REER, parent B',t:'money',showIf:isCouple},
+        {k:'reee',l:'REEE (valeur totale)',t:'money'},
+        {k:'placements',l:'Placements non enregistrés',t:'money'},
+        {k:'vehicule',l:'Valeur estimée du ou des véhicules',t:'money'},
+        {k:'autresActifs',l:'Autres actifs (dépôts, cryptos, objets de valeur)',t:'money'},
+        {k:'propriete',l:'Valeur de la propriété',t:'money',showIf:S=>S.logement==='Propriétaire'},
+        {k:'hypotheque',l:'Solde hypothécaire',t:'money',showIf:S=>S.logement==='Propriétaire'}
+      ]},
+      { legend:'Dettes', fields:[
+        {k:'detteAuto',l:'Solde du prêt auto',t:'money'},
+        {k:'detteAutoTaux',l:'Taux du prêt auto',t:'pct',min:0,max:40},
+        {k:'detteAutoMois',l:'Mois restants sur le prêt auto',t:'int',min:0,max:120},
+        {k:'cartes',l:'Soldes de cartes de crédit reportés',t:'money'},
+        {k:'margeSolde',l:'Marge de crédit ou prêt personnel (solde)',t:'money'},
+        {k:'margeTaux',l:'Taux de la marge ou du prêt personnel',t:'pct',min:0,max:40},
+        {k:'autresDettes',l:'Autres dettes (prêt étudiant, famille)',t:'money'}
+      ]}
+    ]},
+  { id:'droits', title:'Droits de cotisation', short:'Droits',
+    intro:'Les droits réels se trouvent sur l’avis de cotisation de l’ARC (REER, CELI, CELIAPP via Mon dossier). Ils déterminent l’ordre et le montant des cotisations.',
+    groups:[
+      { legend:'CELIAPP', lead:'Les droits ne s’accumulent qu’à partir de l’ouverture du compte : ouvrir tôt, même avec 0 $, fait courir le compteur de 8 000 $ par année (report limité à 8 000 $).', fields:[
+        {k:'celiappStatutA',l:'CELIAPP, parent A',t:'select',o:['Ouvert','Pas encore ouvert','Non admissible']},
+        {k:'celiappStatutB',l:'CELIAPP, parent B',t:'select',o:['Ouvert','Pas encore ouvert','Non admissible'],showIf:isCouple},
+        {k:'droitsCeliappA',l:'Droits CELIAPP disponibles, parent A',t:'money'},
+        {k:'droitsCeliappB',l:'Droits CELIAPP disponibles, parent B',t:'money',showIf:isCouple}
+      ]},
+      { legend:'REER et CELI', fields:[
+        {k:'droitsReerA',l:'Droits REER disponibles, parent A',t:'money'},
+        {k:'droitsReerB',l:'Droits REER disponibles, parent B',t:'money',showIf:isCouple},
+        {k:'droitsCeliA',l:'Droits CELI disponibles, parent A',t:'money'},
+        {k:'droitsCeliB',l:'Droits CELI disponibles, parent B',t:'money',showIf:isCouple}
+      ]},
+      { legend:'REEE', lead:'2 500 $ par enfant par année déclenchent 500 $ de SCEE et 250 $ d’IQEE : 30 % de rendement garanti avant même d’investir.', fields:[
+        {k:'reeeStatut',l:'REEE',t:'select',o:['Ouvert','Pas encore ouvert','Pas d’enfant']},
+        {k:'nasEnfant',l:'Numéro d’assurance sociale obtenu pour chaque enfant',t:'select',o:['Oui','Non','Pas encore d’enfant'],h:'Requis pour ouvrir le REEE et recevoir les subventions.'}
+      ]}
+    ]},
+  { id:'protection', title:'Protection et succession', short:'Protection',
+    intro:'La partie la plus souvent négligée des jeunes familles. Au Québec, sans testament, un conjoint de fait n’hérite pas automatiquement et un enfant mineur ne peut pas gérer un héritage.',
+    groups:[
+      { legend:'Documents juridiques', fields:[
+        {k:'testamentA',l:'Testament à jour, parent A',t:'select',o:OUI_NON_VERIF},
+        {k:'testamentB',l:'Testament à jour, parent B',t:'select',o:OUI_NON_VERIF,showIf:isCouple},
+        {k:'mandatA',l:'Mandat de protection, parent A',t:'select',o:OUI_NON_VERIF},
+        {k:'mandatB',l:'Mandat de protection, parent B',t:'select',o:OUI_NON_VERIF,showIf:isCouple},
+        {k:'tuteur',l:'Tuteur désigné pour les enfants dans le testament',t:'select',o:['Oui','Non','Pas d’enfant']},
+        {k:'beneficiaires',l:'Bénéficiaires des assurances et régimes revus depuis la naissance',t:'select',o:OUI_NON_VERIF,h:'Au Québec, les désignations de bénéficiaires sur REER et CELI non assurance passent par le testament.'}
+      ]},
+      { legend:'Assurances', fields:[
+        {k:'assVieA',l:'Assurance vie, parent A (capital total)',t:'money'},
+        {k:'assVieB',l:'Assurance vie, parent B (capital total)',t:'money',showIf:isCouple},
+        {k:'assInvA',l:'Assurance invalidité, parent A',t:'select',o:['Oui, par l’employeur','Oui, individuelle','Oui, les deux','Non','À vérifier']},
+        {k:'assInvB',l:'Assurance invalidité, parent B',t:'select',o:['Oui, par l’employeur','Oui, individuelle','Oui, les deux','Non','À vérifier'],showIf:isCouple},
+        {k:'assMaladieGrave',l:'Assurance maladies graves',t:'select',o:OUI_NON_VERIF},
+        {k:'assCollectiveEnfant',l:'Enfant ajouté à l’assurance collective ou au régime d’assurance médicaments',t:'select',o:['Oui','Non','Non applicable'],h:'Délai habituel de 30 jours après la naissance pour l’ajout sans preuve d’assurabilité.'}
+      ]},
+      { legend:'Union parentale (conjoints de fait)', lead:'Depuis le 30 juin 2025, les conjoints de fait qui ont un enfant ensemble sont automatiquement en union parentale : patrimoine commun (résidences, meubles, véhicules), protection de la résidence familiale, prestation compensatoire et droit d’hériter du tiers sans testament.', fields:[
+        {k:'unionParentale',l:'Vous connaissez les effets du régime d’union parentale',t:'select',o:['Oui','Non','Ne s’applique pas'],showIf:isFait},
+        {k:'conventionUP',l:'Convention notariée sur le patrimoine d’union parentale',t:'select',o:['Oui','Non','À évaluer avec un notaire'],showIf:isFait,h:'Le retrait ou la modification du patrimoine se fait par acte notarié; renonciation possible dans les 90 jours de la naissance.'}
+      ]}
+    ]},
+  { id:'revenus', title:'Revenus et carrière', short:'Revenus',
+    intro:'Augmenter le revenu principal reste le levier le plus puissant. Le revenu secondaire doit être déclaré, autorisé par l’employeur et évalué après impôt.',
+    groups:[
+      { legend:'Rémunération', fields:[
+        {k:'salaireCibleA',l:'Salaire cible à négocier d’ici 12 mois, parent A',t:'money'},
+        {k:'salaireCibleB',l:'Salaire cible à négocier d’ici 12 mois, parent B',t:'money',showIf:isCouple},
+        {k:'argumentaire',l:'Arguments de négociation (économies réalisées, responsabilités, résultats)',t:'textarea',r:false,span2:true}
+      ]},
+      { legend:'Revenu secondaire', fields:[
+        {k:'revenuSecondaireType',l:'Type de revenu secondaire envisagé',t:'select',o:['Aucun','Consultation ou travail autonome','Emploi à temps partiel','Revenus locatifs ou autres']},
+        {k:'revenuSecondaireCible',l:'Revenu secondaire brut annuel visé',t:'money',showIf:S=>has(S.revenuSecondaireType)&&S.revenuSecondaireType!=='Aucun'},
+        {k:'autorisationEmployeur',l:'Autorisation écrite de l’employeur principal',t:'select',o:['Oui, obtenue','Non','À vérifier','Ne s’applique pas'],showIf:S=>has(S.revenuSecondaireType)&&S.revenuSecondaireType!=='Aucun',h:'Vérifiez les clauses d’exclusivité, de conflit d’intérêts et de confidentialité du contrat d’emploi.'},
+        {k:'tauxHoraire',l:'Taux horaire envisagé',t:'money',showIf:S=>S.revenuSecondaireType==='Consultation ou travail autonome'},
+        {k:'heuresMois',l:'Heures facturables par mois',t:'int',min:0,max:200,showIf:S=>S.revenuSecondaireType==='Consultation ou travail autonome'}
+      ]}
+    ]},
+  { id:'immobilier', title:'Projet immobilier', short:'Immobilier', showIf:buys, pendingIf:S=>!has(S.horizonAchat),
+    intro:'Acheter seulement si le coût complet est soutenable. L’outil calcule le paiement, le test de résistance, les frais de clôture et compare location et achat sur votre horizon.',
+    groups:[
+      { legend:'Le projet', fields:[
+        {k:'prixCible',l:'Prix cible de la propriété',t:'money'},
+        {k:'miseDeFonds',l:'Mise de fonds prévue (toutes sources)',t:'money',h:'CELIAPP, RAP (jusqu’à 60 000 $ par personne), CELI, épargne, don familial.'},
+        {k:'tauxHypo',l:'Taux hypothécaire anticipé',t:'pct',min:0,max:20,d:4.5},
+        {k:'amortissement',l:'Amortissement',t:'select',o:['25 ans','30 ans'],h:'30 ans possible pour les premiers acheteurs avec prêt assuré et pour les constructions neuves.'},
+        {k:'ville',l:'Municipalité',t:'select',o:['Montréal','Ville de Québec','Autre municipalité'],h:'Montréal et plusieurs villes ajoutent des tranches de droits de mutation au-delà de 500 000 $.'}
+      ]},
+      { legend:'Coûts récurrents', fields:[
+        {k:'taxesAnnuelles',l:'Taxes municipales et scolaires (annuel)',t:'money'},
+        {k:'assuranceHab',l:'Assurance habitation (annuel)',t:'money'},
+        {k:'fraisCondo',l:'Frais de copropriété (mensuel), 0 si aucun',t:'money'},
+        {k:'entretienPct',l:'Entretien annuel, en % de la valeur',t:'pct',min:0,max:5,d:1}
+      ]},
+      { legend:'Comparaison location et achat', fields:[
+        {k:'loyerCompar',l:'Loyer d’un logement comparable (mensuel)',t:'money'},
+        {k:'appreciation',l:'Appréciation annuelle présumée de la propriété',t:'pct',min:-5,max:10,d:3},
+        {k:'rendementAlt',l:'Rendement présumé si la mise de fonds reste investie',t:'pct',min:0,max:12,d:5},
+        {k:'horizonDetention',l:'Horizon de détention (années)',t:'int',min:1,max:40,d:10}
+      ]}
+    ]},
+  { id:'projections', title:'Projections', short:'Projections',
+    intro:'Trois scénarios de rendement, nets d’inflation. Les projections ne sont pas des promesses : elles servent à vérifier si le plan est cohérent avec les objectifs.',
+    groups:[
+      { legend:'Hypothèses', fields:[
+        {k:'tolerance',l:'Tolérance au risque du ménage',t:'select',o:['Faible','Modérée','Élevée']},
+        {k:'rendPrudent',l:'Rendement annuel, scénario prudent',t:'pct',min:0,max:15,d:3},
+        {k:'rendCentral',l:'Rendement annuel, scénario central',t:'pct',min:0,max:15,d:5},
+        {k:'rendOptimiste',l:'Rendement annuel, scénario optimiste',t:'pct',min:0,max:20,d:7},
+        {k:'inflationPlan',l:'Inflation annuelle',t:'pct',min:0,max:10,d:2},
+        {k:'retraiteAge',l:'Âge de retraite visé',t:'int',min:50,max:75,d:65}
+      ]}
+    ]},
+  { id:'plan', title:'Plan d’action', short:'Plan',
+    intro:'Des cibles chiffrées et trois actions concrètes. Le PDF les transforme en feuille de route de 12 mois.',
+    groups:[
+      { legend:'Cibles d’épargne annuelles', fields:[
+        {k:'cibleUrgenceMois',l:'Fonds d’urgence visé (mois de dépenses essentielles)',t:'int',min:1,max:24,d:6},
+        {k:'epargneAuto',l:'Épargne automatique mensuelle visée, hors cotisations ci-dessous',t:'money'},
+        {k:'versCeliappA',l:'CELIAPP, parent A (annuel)',t:'money'},{k:'versCeliappB',l:'CELIAPP, parent B (annuel)',t:'money',showIf:isCouple},
+        {k:'versReerA',l:'REER, parent A (annuel)',t:'money'},{k:'versReerB',l:'REER, parent B (annuel)',t:'money',showIf:isCouple},
+        {k:'versCeliA',l:'CELI, parent A (annuel)',t:'money'},{k:'versCeliB',l:'CELI, parent B (annuel)',t:'money',showIf:isCouple},
+        {k:'versReee',l:'REEE, tous les enfants (annuel)',t:'money'},
+        {k:'remboursementSupp',l:'Remboursement de dettes additionnel (mensuel)',t:'money'}
+      ]},
+      { legend:'Mes trois actions prioritaires', fields:[
+        {k:'action1',l:'Action 1',t:'text',span2:true},{k:'action2',l:'Action 2',t:'text',span2:true},{k:'action3',l:'Action 3',t:'text',span2:true},
+        {k:'questions',l:'Questions pour mon conseiller ou pour Claude',t:'textarea',r:false,span2:true},
+        {k:'revue',l:'Prochaine révision du plan',t:'select',o:['Dans 3 mois','Dans 6 mois','Dans 12 mois']}
+      ]}
+    ]},
+  { id:'generer', title:'Générer le plan', short:'PDF', custom:'generate' }
+];
+
+/* ---------- État ---------- */
+const STORE_KEY='planfam2026.v1', PARAM_KEY='planfam2026.params.v1', THEME_KEY='planfam2026.theme';
+let S = {}; let current = 0;
+function fieldsOf(sec){ return (sec.groups||[]).flatMap(g=>g.fields); }
+const ALL_FIELDS = SECTIONS.flatMap(fieldsOf);
+const FIELD_BY_KEY = Object.fromEntries(ALL_FIELDS.map(f=>[f.k,f]));
+function applyDefaults(){ ALL_FIELDS.forEach(f=>{ if(f.d!==undefined && !has(S[f.k])) S[f.k]=f.d; }); }
+function load(){
+  try{ S = JSON.parse(localStorage.getItem(STORE_KEY)||'{}')||{}; }catch(e){ S={}; }
+  try{ const p=JSON.parse(localStorage.getItem(PARAM_KEY)||'{}'); Object.keys(p).forEach(k=>{ if(k in P) P[k]=p[k]; }); }catch(e){}
+}
+function applySectionDefaults(sec){ let changed=false; fieldsOf(sec).forEach(f=>{ if(f.d!==undefined && !has(S[f.k])){ S[f.k]=f.d; changed=true; } }); if(changed) save(); }
+let saveTimer=null;
+function save(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ try{ localStorage.setItem(STORE_KEY,JSON.stringify(S)); localStorage.setItem(PARAM_KEY,JSON.stringify(P)); }catch(e){} },150); }
+function visibleSection(sec){ return !sec.showIf || sec.showIf(S); }
+function fieldVisible(f){ return !f.showIf || f.showIf(S); }
+function fieldRequired(f){ return f.r!==false && f.t!=='check'; }
+function fieldFilled(f){ const v=S[f.k]; if(f.t==='check') return true; return has(v) && String(v).trim()!==''; }
+function sectionStats(sec){
+  if(sec.custom) return {req:0,done:0,pct:100};
+  if(sec.pendingIf&&sec.pendingIf(S)) return {req:0,done:0,pct:0,pending:true};
+  if(!visibleSection(sec)) return {req:0,done:0,pct:100,skipped:true};
+  const fs=fieldsOf(sec).filter(f=>fieldVisible(f)&&fieldRequired(f));
+  const done=fs.filter(fieldFilled).length;
+  return {req:fs.length,done,pct:fs.length?Math.round(done/fs.length*100):100};
+}
+function globalStats(){
+  let req=0,done=0; SECTIONS.forEach(sec=>{ const st=sectionStats(sec); req+=st.req; done+=st.done; });
+  return {req,done,pct:req?Math.round(done/req*100):0};
+}
+function missingFields(){
+  const out=[]; SECTIONS.forEach((sec,i)=>{ if(sec.custom||!visibleSection(sec)) return; fieldsOf(sec).forEach(f=>{ if(fieldVisible(f)&&fieldRequired(f)&&!fieldFilled(f)) out.push({sec:i,f}); }); });
+  return out;
+}
+
+/* ---------- Rendu du questionnaire ---------- */
+const $ = sel => document.querySelector(sel);
+const panel = () => $('#panel');
+function controlHTML(f){
+  const v = S[f.k]; const val = has(v)?(f.t==='money'?esc(fmtNum(num(v))):esc(v)):'';
+  const unit = f.t==='money'?'$':(f.t==='pct'?'%':'');
+  if(f.t==='select'){
+    const opts = ['<option value="">Choisir…</option>'].concat(f.o.map(o=>`<option value="${esc(o)}" ${v===o?'selected':''}>${esc(o)}</option>`)).join('');
+    return `<div class="control"><select id="f_${f.k}" data-k="${f.k}">${opts}</select></div>`;
+  }
+  if(f.t==='textarea') return `<div class="control"><textarea id="f_${f.k}" data-k="${f.k}" rows="3">${val}</textarea></div>`;
+  if(f.t==='text') return `<div class="control"><input id="f_${f.k}" data-k="${f.k}" type="text" value="${val}" autocomplete="off"></div>`;
+  if(f.t==='check') return `<div class="check"><input id="f_${f.k}" data-k="${f.k}" type="checkbox" ${v?'checked':''}><label for="f_${f.k}">${esc(f.l)}</label></div>`;
+  const step = f.t==='int'?'1':(f.t==='pct'?'0.01':'1');
+  return `<div class="control"><input id="f_${f.k}" data-k="${f.k}" type="text" inputmode="decimal" value="${val}" placeholder="0" data-step="${step}" ${f.min!==undefined?`data-min="${f.min}"`:''} ${f.max!==undefined?`data-max="${f.max}"`:''} autocomplete="off"><span class="unit">${unit}</span></div>`;
+}
+function fieldHTML(f){
+  if(!fieldVisible(f)) return '';
+  const req=fieldRequired(f), filled=fieldFilled(f);
+  const cls=['field',f.span2?'span2':'',req&&!filled?'missing':'',req&&filled?'filled':''].join(' ');
+  if(f.t==='check') return `<div class="${cls}" data-field="${f.k}">${controlHTML(f)}${f.h?`<div class="help">${esc(f.h)}</div>`:''}</div>`;
+  return `<div class="${cls}" data-field="${f.k}"><label for="f_${f.k}">${esc(f.l)}${req?'<span class="req" aria-label="requis">•</span>':'<span class="help">(facultatif)</span>'}</label>${controlHTML(f)}${f.h?`<div class="help">${esc(f.h)}</div>`:''}</div>`;
+}
+function renderRail(){
+  const ol=$('#rail'); const g=globalStats();
+  ol.innerHTML = SECTIONS.map((sec,i)=>{
+    const st=sectionStats(sec); let cls='dot';
+    if(sec.custom==='generate') cls += g.pct===100?' done':'';
+    else if(sec.custom) cls+=' done';
+    else if(st.skipped) cls+=' done';
+    else if(st.pct===100) cls+=' done'; else if(st.done>0) cls+=' partial';
+    return `<li><button type="button" data-go="${i}" ${i===current?'aria-current="step"':''}><span class="${cls}"><span>${i}</span></span><span>${esc(sec.short)}</span></button></li>`;
+  }).join('');
+  const off=113.1*(1-g.pct/100); $('#ringBar').style.strokeDashoffset=off; $('#ringPct').textContent=g.pct+NNBSP+'%';
+}
+function renderSection(){
+  const sec=SECTIONS[current]; const el=panel();
+  if(sec.custom==='welcome'){ el.innerHTML=welcomeHTML(); return; }
+  if(sec.custom==='generate'){ el.innerHTML=generateHTML(); return; }
+  if(!visibleSection(sec)){
+    const pending=sec.pendingIf&&sec.pendingIf(S);
+    el.innerHTML=`<div class="step-kicker">Étape ${current} sur ${SECTIONS.length-1}</div><h2>${esc(sec.title)}</h2><p class="intro">${pending?'Cette étape s’active selon votre réponse à la question « Achat immobilier envisagé » de l’étape Famille. Répondez-y d’abord : si un achat est envisagé, les questions du projet apparaîtront ici.':'Cette étape ne s’applique pas : aucun achat immobilier n’est prévu. Vous pouvez la réactiver en changeant la réponse « Achat immobilier envisagé » à l’étape Famille.'}</p>${pending?`<button class="btn" type="button" data-goto-field="horizonAchat" data-sec="1">Répondre à la question</button>`:''}${footHTML()}`;
+    return;
+  }
+  const st=sectionStats(sec);
+  const state = st.pct===100?'<span class="state done">Complète</span>':(st.done>0?`<span class="state partial">${st.done} / ${st.req}</span>`:`<span class="state">${st.req} questions</span>`);
+  const groups = sec.groups.map(g=>{
+    const fs=g.fields.filter(fieldVisible); if(!fs.length) return '';
+    const numeric=fs.some(f=>['money','pct','int','num'].includes(f.t)&&fieldRequired(f));
+    return `<fieldset class="fieldset"><legend>${esc(g.legend)}</legend>${g.lead?`<p class="lead">${esc(g.lead)}</p>`:''}<div class="grid">${fs.map(fieldHTML).join('')}</div>${numeric?`<div style="margin-top:10px"><button type="button" class="zero-btn" data-zero="${esc(g.legend)}">Mettre à 0 les champs vides de ce bloc</button></div>`:''}</fieldset>`;
+  }).join('');
+  el.innerHTML=`<div class="panel-head"><div><div class="step-kicker">Étape ${current} sur ${SECTIONS.length-1}</div><h2>${esc(sec.title)}</h2></div>${state}</div><p class="intro">${esc(sec.intro)}</p>${groups}<div id="live"></div>${footHTML()}`;
+  renderLive();
+}
+function footHTML(){
+  const prev=current>0?`<button class="btn ghost" type="button" data-go="${current-1}">← Précédent</button>`:'<span></span>';
+  const next=current<SECTIONS.length-1?`<button class="btn primary" type="button" data-go="${current+1}">${current===SECTIONS.length-2?'Voir la génération du PDF':'Étape suivante'} →</button>`:'';
+  return `<div class="panel-foot">${prev}${next}</div>`;
+}
+function userTouched(){ return ALL_FIELDS.some(f=>f.d===undefined&&fieldFilled(f)&&f.t!=='check'); }
+function welcomeHTML(){
+  const g=globalStats(); const touched=userTouched();
+  return `<div class="step-kicker">Octobre 2026 · Québec</div>
+  <h1>Le plan de match financier d’une jeune famille, en 10 étapes</h1>
+  <p class="intro" style="max-width:66ch">Un outil gratuit pour organiser le budget, traverser le congé parental sans surprise, utiliser les bons comptes dans le bon ordre, protéger la famille et décider d’un achat immobilier avec des chiffres complets. À la fin, un PDF clair résume votre plan.</p>
+  <div class="note"><p><b>Confidentialité.</b> Tout se passe dans votre navigateur : les réponses sont enregistrées sur cet appareil seulement et le PDF est produit localement. Aucune donnée n’est transmise ni collectée. Avant de partager le PDF, rappelez-vous qu’il contient vos renseignements financiers.</p></div>
+  <div class="welcome-grid">
+    <div><b>Chiffres 2026 vérifiés</b><p>Plafonds CELI, REER et CELIAPP, RQAP, allocations, paliers d’impôt, droits de mutation. Modifiables dans « Paramètres 2026 ».</p></div>
+    <div><b>Estimations en direct</b><p>Revenu net, prestations RQAP, allocations, patrimoine net, test de résistance hypothécaire et projections se calculent pendant que vous répondez.</p></div>
+    <div><b>Priorités automatiques</b><p>Le tableau de bord classe vos prochaines actions selon vos réponses : fonds d’urgence, REEE, CELIAPP, testament, dettes.</p></div>
+    <div><b>PDF complet</b><p>Disponible quand toutes les questions requises sont répondues. Enregistrez-le, imprimez-le ou soumettez-le à un conseiller.</p></div>
+  </div>
+  <h3 style="margin-top:22px">Mode d’emploi</h3>
+  <ol class="steps-list">
+    <li><span class="dot"><span>1</span></span><span><b>Répondre aux 9 étapes</b> <span class="s">avec vos chiffres réels (avis de cotisation, talons de paie, relevés). Les champs marqués d’un point sont requis; un 0 est une réponse valide.</span></span></li>
+    <li><span class="dot"><span>2</span></span><span><b>Lire le tableau de bord</b> <span class="s">au fil des réponses : indicateurs, feux et priorités s’ajustent.</span></span></li>
+    <li><span class="dot"><span>3</span></span><span><b>Générer le PDF</b> <span class="s">à l’étape 10, puis le faire réviser (conseiller, planificateur financier, notaire ou Claude avec le mandat fourni).</span></span></li>
+  </ol>
+  <div class="note warn" style="margin-top:20px"><p>Cet outil fournit de l’information générale et des estimations. Il ne remplace pas un planificateur financier, un fiscaliste ou un notaire. Validez les chiffres officiels à la date d’utilisation (canada.ca, revenuquebec.ca, retraitequebec.gouv.qc.ca, rqap.gouv.qc.ca).</p></div>
+  <div class="panel-foot"><span class="small muted">${touched?`Vous avez déjà complété ${g.pct}${NNBSP}% du questionnaire.`:'Comptez environ 20 à 30 minutes avec vos documents sous la main.'}</span><button class="btn primary" type="button" data-go="1">${touched?'Continuer':'Commencer'} →</button></div>`;
+}
+</script>
+<script>
+/* ---------- Moteur de calcul ---------- */
+function progressive(amount, limits, rates){
+  let tax=0, prev=0;
+  for(let i=0;i<rates.length;i++){
+    const top = i<limits.length?limits[i]:Infinity;
+    if(amount>prev){ tax += (Math.min(amount,top)-prev)*rates[i]/100; }
+    prev=top;
+  }
+  return tax;
+}
+function fedRateAt(x){ const L=[P.fedB1,P.fedB2,P.fedB3,P.fedB4], R=[P.fedR1,P.fedR2,P.fedR3,P.fedR4,P.fedR5]; for(let i=0;i<L.length;i++){ if(x<=L[i]) return R[i]; } return R[4]; }
+function qcRateAt(x){ const L=[P.qcB1,P.qcB2,P.qcB3], R=[P.qcR1,P.qcR2,P.qcR3,P.qcR4]; for(let i=0;i<L.length;i++){ if(x<=L[i]) return R[i]; } return R[3]; }
+function marginalAt(taxable){ return fedRateAt(taxable)*(1-P.fedAbat/100) + qcRateAt(taxable); }
+function fedBPAat(income){ if(income<=P.fedB3) return P.fedBPA; if(income>=P.fedB4) return P.fedBPAmin; return P.fedBPA-(P.fedBPA-P.fedBPAmin)*(income-P.fedB3)/(P.fedB4-P.fedB3); }
+/* Estimation du revenu net d’emploi (salarié au Québec). salary = revenu d’emploi; otherTaxable = prestations imposables sans cotisations (RQAP); deductions = REER/CELIAPP */
+function estimateNet(salary, otherTaxable=0, deductions=0){
+  salary=Math.max(0,salary); otherTaxable=Math.max(0,otherTaxable);
+  const pensionable=Math.min(salary,P.rrqMGA), baseEarn=Math.max(0,pensionable-P.rrqExemption);
+  const rrqBase=baseEarn*P.rrqBase/100, rrqS1=baseEarn*P.rrqSupp1/100, rrqS2=Math.max(0,Math.min(salary,P.rrqMSGA)-P.rrqMGA)*P.rrqSupp2/100;
+  const ae=Math.min(salary,P.aeMRA)*P.aeTaux/100, rqap=Math.min(salary,P.rqapMRA)*P.rqapCot/100;
+  const gross=salary+otherTaxable;
+  const taxFed=Math.max(0,gross-rrqS1-rrqS2-deductions);
+  const taxQc=Math.max(0,taxFed-Math.min(P.qcTravailleur,salary*0.06));
+  const fedGross=progressive(taxFed,[P.fedB1,P.fedB2,P.fedB3,P.fedB4],[P.fedR1,P.fedR2,P.fedR3,P.fedR4,P.fedR5]);
+  const fedCred=(fedBPAat(taxFed)+Math.min(P.fedEmploi,salary)+rrqBase+ae+rqap)*P.fedR1/100;
+  const fedTax=Math.max(0,fedGross-fedCred)*(1-P.fedAbat/100);
+  const qcGross=progressive(taxQc,[P.qcB1,P.qcB2,P.qcB3],[P.qcR1,P.qcR2,P.qcR3,P.qcR4]);
+  const qcCred=(P.qcBPA+rrqBase+ae+rqap)*P.qcR1/100;
+  const qcTax=Math.max(0,qcGross-qcCred);
+  const net=gross-(rrqBase+rrqS1+rrqS2)-ae-rqap-fedTax-qcTax;
+  return {gross,salary,rrq:rrqBase+rrqS1+rrqS2,ae,rqap,fedTax,qcTax,net,taxable:taxFed,marginal:marginalAt(taxFed),effective:gross>0?1-net/gross:0};
+}
+const pmt=(r,n,pv)=> n<=0?0:(r===0?pv/n:pv*r/(1-Math.pow(1+r,-n)));
+const fv=(r,n,pv,pmtA)=> pv*Math.pow(1+r,n)+(r===0?pmtA*n:pmtA*(Math.pow(1+r,n)-1)/r);
+function balanceAfter(principal,rMonthly,nTotal,kPaid){ if(kPaid>=nTotal) return 0; const p=pmt(rMonthly,nTotal,principal); return rMonthly===0?principal-p*kPaid:principal*Math.pow(1+rMonthly,kPaid)-p*(Math.pow(1+rMonthly,kPaid)-1)/rMonthly; }
+
+function rqapCalc(S, incomes){
+  if(!hasConge(S)) return null;
+  const couple=isCouple(S), base=S.rqapRegime!=='Régime particulier';
+  const wA=Math.min(num(S.revenuA),P.rqapMRA)/52, wB=couple?Math.min(num(S.revenuB),P.rqapMRA)/52:0;
+  let semA=num(S.semainesA), semB=couple?num(S.semainesB):0;
+  const hi=(base?P.rqapBaseHaut:P.rqapPart)/100, lo=(base?P.rqapBaseBas:P.rqapPart)/100;
+  const matMax=base?P.rqapMatBase:P.rqapMatPart, patMax=base?P.rqapPatBase:P.rqapPatPart;
+  const mat=Math.min(semA,matMax), parA=semA-mat, pat=Math.min(semB,patMax), parB=semB-pat;
+  const bonusOk= couple && parA>=(base?8:6) && parB>=(base?8:6);
+  const parMax=(base?P.rqapPar70+P.rqapPar55:P.rqapParPart)+(bonusOk?(base?P.rqapBonusBase:P.rqapBonusPart):0);
+  const excess=Math.max(0,parA+parB-parMax);
+  let a70=0,b70=0,a55=parA,b55=parB;
+  if(base){ a70=Math.min(parA,P.rqapPar70); b70=Math.min(parB,P.rqapPar70-a70); a55=parA-a70; b55=parB-b70; }
+  const grossA = base? wA*(hi*(mat+a70)+lo*a55) : wA*hi*(mat+parA);
+  const grossB = base? wB*(hi*(pat+b70)+lo*b55) : wB*hi*(pat+parB);
+  const topupWeeks=Math.min(num(S.topupSemaines),semA), topup=num(S.topupPct)/100*(num(S.revenuA)/52)*topupWeeks;
+  const salaryA_year=num(S.revenuA)*Math.max(0,52-semA)/52+topup, salaryB_year=couple?num(S.revenuB)*Math.max(0,52-semB)/52:0;
+  const yearA=estimateNet(salaryA_year,grossA), yearB=couple?estimateNet(salaryB_year,grossB):{net:0,effective:0};
+  const effA=yearA.effective, effB=yearB.effective;
+  const weeklyNetA = semA>0 ? ((grossA+topup)/semA)*(1-effA) : 0;
+  const weeklyNetB = semB>0 ? (grossB/semB)*(1-effB) : 0;
+  const normalWeeklyNetA=incomes.A.net/52, normalWeeklyNetB=couple?incomes.B.net/52:0;
+  const gapA=Math.max(0,(normalWeeklyNetA-weeklyNetA)*semA), gapB=Math.max(0,(normalWeeklyNetB-weeklyNetB)*semB);
+  const monthlyDuringA = weeklyNetA*52/12 + (couple?incomes.B.net/12:0);
+  return {base,wA,wB,semA,semB,mat,pat,parA,parB,bonusOk,parMax,excess,grossA,grossB,topup,topupWeeks,weeklyNetA,weeklyNetB,gapA,gapB,gapTotal:gapA+gapB,monthlyDuringA,monthsA:semA/4.345,leaveYearNet:yearA.net+yearB.net,leaveYearTaxable:yearA.taxable+(yearB.taxable||0),effA};
+}
+function aceCalc(afni,k6,k17){
+  const n=k6+k17; if(n<=0) return 0; const idx=Math.min(n,4);
+  const max=k6*P.aceMoins6+k17*P.ace6a17, t1=P['aceT1_'+idx]/100, t2=P['aceT2_'+idx]/100;
+  let red=0; if(afni>P.aceS2) red=t1*(P.aceS2-P.aceS1)+t2*(afni-P.aceS2); else if(afni>P.aceS1) red=t1*(afni-P.aceS1);
+  return Math.max(0,max-red);
+}
+function afCalc(income,n,mono){
+  if(n<=0) return 0; const maxT=n*P.afMax, minT=n*P.afMin, seuil=mono?P.afSeuilMono:P.afSeuilCouple;
+  const red=P.afTaux/100*Math.max(0,income-seuil); let total=Math.max(minT,maxT-red);
+  if(mono){ const left=Math.max(0,red-(maxT-minT)); total+=clamp(P.afMonoMax-left,P.afMonoMin,P.afMonoMax); }
+  return total;
+}
+function welcomeTax(price){
+  let t=0; t+=Math.min(price,P.dmT1)*P.dmR1/100; if(price>P.dmT1) t+=(Math.min(price,P.dmT2)-P.dmT1)*P.dmR2/100; if(price>P.dmT2) t+=(price-P.dmT2)*P.dmR3/100;
+  if(P.dmTauxMun>0 && price>P.dmSeuilMun) t+=(price-P.dmSeuilMun)*(P.dmTauxMun-P.dmR3)/100;
+  return t;
+}
+
+function compute(){
+  const C={}; const couple=isCouple(S); C.couple=couple;
+  const k6=num(S.enfantsMoins6), k17=num(S.enfants6a17); C.kids=k6+k17; C.k6=k6; C.k17=k17;
+  const versReerA=num(S.versReerA), versReerB=couple?num(S.versReerB):0, versCeliappA=num(S.versCeliappA), versCeliappB=couple?num(S.versCeliappB):0;
+  C.inc={A:estimateNet(num(S.revenuA)), B:couple?estimateNet(num(S.revenuB)):estimateNet(0)};
+  C.incDed={A:estimateNet(num(S.revenuA),0,versReerA+versCeliappA), B:couple?estimateNet(num(S.revenuB),0,versReerB+versCeliappB):estimateNet(0)};
+  C.grossHousehold=num(S.revenuA)+(couple?num(S.revenuB):0);
+  C.netAnnualEst=C.inc.A.net+C.inc.B.net; C.netMonthlyEst=C.netAnnualEst/12;
+  C.netMonthly = has(S.revenuNetReel)&&num(S.revenuNetReel)>0 ? num(S.revenuNetReel) : C.netMonthlyEst;
+  C.marginalA=C.inc.A.marginal; C.marginalB=couple?C.inc.B.marginal:0;
+  /* RQAP */
+  C.rqap=rqapCalc(S,C.inc);
+  /* Allocations : revenu familial net rajusté estimé = revenu imposable moins cotisations déductibles prévues */
+  const afniNow=C.inc.A.taxable+C.inc.B.taxable-(versReerA+versReerB+versCeliappA+versCeliappB);
+  C.afniNow=Math.max(0,afniNow);
+  C.aceNow=aceCalc(C.afniNow,k6,k17); C.afNow=afCalc(C.afniNow,C.kids,!couple);
+  C.allocAnnualEst=C.aceNow+C.afNow; 
+  C.allocMonthly = has(S.allocationsReelles)&&num(S.allocationsReelles)>0 ? num(S.allocationsReelles) : C.allocAnnualEst/12;
+  if(C.rqap){ const afniLeave=Math.max(0,C.rqap.leaveYearTaxable-(versReerA+versReerB+versCeliappA+versCeliappB)); C.afniLeave=afniLeave; C.aceLeave=aceCalc(afniLeave,k6,k17); C.afLeave=afCalc(afniLeave,C.kids,!couple); }
+  /* Garderie */
+  const lowMarg = couple? Math.min(C.marginalA,C.marginalB) : C.marginalA;
+  const fedLowRate = (couple? (C.inc.A.marginal<=C.inc.B.marginal?fedRateAt(C.inc.A.taxable):fedRateAt(C.inc.B.taxable)) : fedRateAt(C.inc.A.taxable))*(1-P.fedAbat/100)/100;
+  if(S.garderieType==='Garderie non subventionnée'&&num(S.garderieTarif)>0){ const g=num(S.garderieTarif)*21; const credit=g*P.creditGarde/100; const fedDed=Math.min(g*12,8000)/12*fedLowRate; C.garderie={brut:g,credit,fedDed,net:Math.max(0,g-credit-fedDed)}; }
+  else if(S.garderieType&&S.garderieType.startsWith('Place subventionnée')){ const g=P.garderieCPE*21; const fedDed=g*fedLowRate; C.garderie={brut:g,credit:0,fedDed,net:Math.max(0,g-fedDed)}; }
+  /* Budget */
+  const expKeys=['loyer','energie','epicerie','transport','autoPaiement','assurances','telecom','garde','bebe','loisirs','autresDettesPaiement','autresDepenses'];
+  const essKeys=['loyer','energie','epicerie','transport','autoPaiement','assurances','telecom','garde','bebe','autresDettesPaiement'];
+  C.expenses=expKeys.reduce((a,k)=>a+num(S[k]),0); C.essentials=essKeys.reduce((a,k)=>a+num(S[k]),0);
+  const SHORT={loyer:'Logement',energie:'Énergie',epicerie:'Épicerie',transport:'Transport',autoPaiement:'Auto',assurances:'Assurances',telecom:'Télécom',garde:'Garde',bebe:'Bébé',loisirs:'Loisirs',autresDettesPaiement:'Dettes',autresDepenses:'Autres'};
+  C.expenseRows=expKeys.map(k=>({k,label:FIELD_BY_KEY[k].l,short:SHORT[k],v:num(S[k])}));
+  C.income=C.netMonthly+C.allocMonthly; C.savings=num(S.epargneActuelle);
+  C.capacity=C.income-C.expenses; C.unassigned=C.capacity-C.savings;
+  C.savingsRate=C.income>0?C.savings/C.income:0;
+  C.housingRatio=C.netMonthly>0?num(S.loyer)/C.netMonthly:0;
+  C.debtRatio=C.netMonthly>0?(num(S.autoPaiement)+num(S.autresDettesPaiement))/C.netMonthly:0;
+  C.emergencyMonths=C.essentials>0?num(S.comptes)/C.essentials:0;
+  C.emergencyTarget=num(S.cibleUrgenceMois)||6; C.emergencyTargetAmt=C.essentials*C.emergencyTarget; C.emergencyGap=Math.max(0,C.emergencyTargetAmt-num(S.comptes));
+  if(C.rqap){ C.leaveMonthlyIncome=C.rqap.monthlyDuringA+C.allocMonthly; C.leaveMonthlyGap=Math.max(0,C.expenses-C.leaveMonthlyIncome); C.leaveTotalGap=C.leaveMonthlyGap*C.rqap.monthsA; }
+  /* Bilan */
+  const own=S.logement==='Propriétaire';
+  C.assets={liquid:num(S.comptes),celi:num(S.celiA)+(couple?num(S.celiB):0),celiapp:num(S.celiappA)+(couple?num(S.celiappB):0),reer:num(S.reerA)+(couple?num(S.reerB):0),reee:num(S.reee),placements:num(S.placements),vehicule:num(S.vehicule),autres:num(S.autresActifs),propriete:own?num(S.propriete):0};
+  C.liab={auto:num(S.detteAuto),cartes:num(S.cartes),marge:num(S.margeSolde),autres:num(S.autresDettes),hypotheque:own?num(S.hypotheque):0};
+  C.totalAssets=Object.values(C.assets).reduce((a,b)=>a+b,0); C.totalLiab=Object.values(C.liab).reduce((a,b)=>a+b,0);
+  C.netWorth=C.totalAssets-C.totalLiab; C.investable=C.assets.liquid+C.assets.celi+C.assets.celiapp+C.assets.reer+C.assets.placements;
+  C.consumerDebt=C.liab.auto+C.liab.cartes+C.liab.marge+C.liab.autres;
+  /* Dettes */
+  const r=num(S.detteAutoTaux)/100, n=num(S.detteAutoMois);
+  if(C.liab.auto>0&&n>0){ const p=pmt(r/12,n,C.liab.auto); C.car={payment:p,interest:p*n-C.liab.auto,rate:r*100}; }
+  C.cardInterest=C.liab.cartes*P.tauxCarte/100; C.margeRate=num(S.margeTaux)||P.tauxMarge; C.margeInterest=C.liab.marge*C.margeRate/100;
+  C.rendCentral=num(S.rendCentral)||5;
+  if(C.car){ const d=C.car.rate-C.rendCentral; C.carVerdict = C.car.rate>=C.rendCentral? 'rembourser' : (d>-1.5?'neutre':'investir'); }
+  /* Comptes enregistrés */
+  C.reerValueA=versReerA*C.marginalA/100; C.reerValueB=versReerB*C.marginalB/100;
+  C.celiappValueA=versCeliappA*C.marginalA/100; C.celiappValueB=versCeliappB*C.marginalB/100;
+  C.spousalGap=couple?Math.abs(C.marginalA-C.marginalB):0; C.highEarner=(!couple||C.marginalA>=C.marginalB)?'A':'B';
+  const versReee=num(S.versReee); C.reeeGrantEligible=Math.min(versReee,P.reeeRepere*C.kids); C.reeeGrants=C.reeeGrantEligible*(P.sceeTaux+P.iqeeTaux)/100; C.reeeGap=Math.max(0,P.reeeRepere*C.kids-versReee);
+  C.contribAnnual=versReerA+versReerB+versCeliappA+versCeliappB+num(S.versCeliA)+(couple?num(S.versCeliB):0)+versReee+num(S.epargneAuto)*12+num(S.remboursementSupp)*12;
+  C.contribAnnualInvest=versReerA+versReerB+versCeliappA+versCeliappB+num(S.versCeliA)+(couple?num(S.versCeliB):0)+num(S.epargneAuto)*12;
+  C.planVsCapacity=C.capacity*12-C.contribAnnual;
+  C.celiappCapA = S.celiappStatutA==='Non admissible'?0:Math.max(0,P.celiappVie-num(S.celiappA)); C.celiappCapB = couple&&S.celiappStatutB!=='Non admissible'?Math.max(0,P.celiappVie-num(S.celiappB)):0;
+  /* Immobilier */
+  if(buys(S)&&num(S.prixCible)>0){
+    const price=num(S.prixCible), down=num(S.miseDeFonds), downPct=price>0?down/price*100:0;
+    const minDown = price<=500000?price*0.05:(price<=1500000?25000+(price-500000)*0.10:price*0.20);
+    const insured = downPct<20 && price<=1500000;
+    const premRate = !insured?0:(downPct<10?P.schl5:(downPct<15?P.schl10:P.schl15));
+    const premium=(price-down)*premRate/100, tvq=premium*P.tvqPrime/100;
+    const principal=price-down+premium; const years=S.amortissement==='30 ans'?30:25; const rate=num(S.tauxHypo)/100;
+    const rm=Math.pow(1+rate/2,1/6)-1; const payment=pmt(rm,years*12,principal);
+    const qRate=Math.max(rate+P.qualifEcart/100,P.qualifPlancher/100); const qrm=Math.pow(1+qRate/2,1/6)-1; const qPayment=pmt(qrm,years*12,principal);
+    const grossM=C.grossHousehold/12;
+    const gds=grossM>0?(qPayment+num(S.taxesAnnuelles)/12+P.chauffage+num(S.fraisCondo)*0.5)/grossM*100:0;
+    const tds=grossM>0?gds+(num(S.autoPaiement)+num(S.autresDettesPaiement)+C.liab.cartes*0.03)/grossM*100:0;
+    const dm=welcomeTax(price); const firstBuyer=S.logement!=='Propriétaire'; const dmCredit=firstBuyer?Math.min(dm,P.dmCredit):0;
+    const closing=dm+tvq+P.notaire+P.inspection+P.demenagement; const closingNet=closing-dmCredit-(firstBuyer?P.cahpFed+P.cahpQc:0);
+    const ownMonthly=payment+num(S.taxesAnnuelles)/12+num(S.assuranceHab)/12+num(S.fraisCondo)+price*num(S.entretienPct)/100/12;
+    const N=Math.max(1,num(S.horizonDetention)||10), appr=num(S.appreciation)/100, alt=num(S.rendementAlt)/100, rent=num(S.loyerCompar)||num(S.loyer);
+    const valueN=price*Math.pow(1+appr,N); const balN=balanceAfter(principal,rm,years*12,N*12); const equityN=valueN*(1-P.fraisVente/100)-balN;
+    const diff=ownMonthly-rent; const altM=Math.pow(1+alt,1/12)-1;
+    const rentWealth=fv(altM,N*12,down+closing,Math.max(0,diff)); const buyWealth=equityN+fv(altM,N*12,0,Math.max(0,-diff));
+    const maxPrice = (function(){ let lo=50000,hi=3000000; for(let i=0;i<40;i++){ const mid=(lo+hi)/2; const dp=Math.min(down,mid*0.95); const pr=mid-dp; const ins=dp/mid<0.2&&mid<=1500000; const pp=ins?pr*(dp/mid<0.10?P.schl5:(dp/mid<0.15?P.schl10:P.schl15))/100:0; const qp=pmt(qrm,years*12,pr+pp); const g=(qp+num(S.taxesAnnuelles)/12+P.chauffage+num(S.fraisCondo)*0.5)/grossM*100; const t=g+(num(S.autoPaiement)+num(S.autresDettesPaiement)+C.liab.cartes*0.03)/grossM*100; if(g<=P.gdsMax&&t<=P.tdsMax) lo=mid; else hi=mid; } return lo; })();
+    C.home={price,down,downPct,minDown,insured,premRate,premium,tvq,principal,years,rate:rate*100,payment,qRate:qRate*100,qPayment,gds,tds,passes:gds<=P.gdsMax&&tds<=P.tdsMax&&down>=minDown,dm,dmCredit,closing,closingNet,ownMonthly,rent,diff,N,valueN,balN,equityN,rentWealth,buyWealth,maxPrice,firstBuyer};
+  }
+  /* Projections */
+  const rates=[num(S.rendPrudent)||3,C.rendCentral,num(S.rendOptimiste)||7], infl=(has(S.inflationPlan)?num(S.inflationPlan):P.inflation)/100;
+  C.proj={rates,infl,horizons:[5,10,20],rows:[]};
+  const yearsToRet = Math.max(0,(num(S.retraiteAge)||65)-num(S.ageA)); if(yearsToRet>0&&![5,10,20].includes(yearsToRet)) C.proj.horizons=[5,10,20,yearsToRet];
+  C.proj.yearsToRet=yearsToRet;
+  C.proj.rows=C.proj.horizons.map(N=>({N,vals:rates.map(rr=>{const nominal=fv(rr/100,N,C.investable,C.contribAnnualInvest); return {nominal,real:nominal/Math.pow(1+infl,N)};})}));
+  /* REEE projection jusqu’à 17 ans du plus jeune (approx. : enfants de moins de 6 ans considérés à 1 an) */
+  if(C.kids>0){ const yrs=k6>0?16:10; const annual=versReee+C.reeeGrants; C.reeeProj={years:yrs,nominal:fv(C.rendCentral/100,yrs,C.assets.reee,annual)}; }
+  /* Assurance vie : besoin simplifié */
+  const liquid=C.investable; 
+  C.lifeNeedA=Math.max(0,P.multAssVie*num(S.revenuA)+C.totalLiab-liquid*0.5); C.lifeGapA=Math.max(0,C.lifeNeedA-num(S.assVieA));
+  if(couple){ C.lifeNeedB=Math.max(0,P.multAssVie*num(S.revenuB)+C.totalLiab-liquid*0.5); C.lifeGapB=Math.max(0,C.lifeNeedB-num(S.assVieB)); }
+  /* Revenu secondaire */
+  if(has(S.revenuSecondaireType)&&S.revenuSecondaireType!=='Aucun'){ const g=num(S.revenuSecondaireCible)||(num(S.tauxHoraire)*num(S.heuresMois)*12); const rate=C.marginalA/100; C.side={gross:g,tax:g*rate,net:g*(1-rate),rate:rate*100,rrqExtra: g>0?Math.min(g,P.rrqMGA)*(P.rrqBase+P.rrqSupp1)*2/100*0.5:0}; }
+  C.raiseNetA=Math.max(0,num(S.salaireCibleA)-num(S.revenuA))*(1-C.marginalA/100);
+  if(couple) C.raiseNetB=Math.max(0,num(S.salaireCibleB)-num(S.revenuB))*(1-C.marginalB/100);
+  C.lights=lightsFor(C); C.priorities=prioritiesFor(C);
+  return C;
+}
+
+/* ---------- Feux ---------- */
+function lightsFor(C){
+  const L=[]; const st=(cond,g,y)=>cond===null?'n':(g?'g':(y?'y':'r'));
+  const budgetReady=C.expenses>0&&C.netMonthly>0;
+  L.push({label:'Fonds d’urgence',state:C.essentials>0?st(true,C.emergencyMonths>=C.emergencyTarget,C.emergencyMonths>=3):'n',value:C.essentials>0?fmtNum(C.emergencyMonths,1)+' mois':'—'});
+  L.push({label:'Taux d’épargne',state:budgetReady?st(true,C.savingsRate>=0.15,C.savingsRate>=0.10):'n',value:budgetReady?fmtPct(C.savingsRate*100,0):'—'});
+  L.push({label:'Poids du logement',state:budgetReady?st(true,C.housingRatio<=0.30,C.housingRatio<=0.35):'n',value:budgetReady?fmtPct(C.housingRatio*100,0):'—'});
+  L.push({label:'Poids des dettes',state:budgetReady?st(true,C.debtRatio<=0.10,C.debtRatio<=0.20):'n',value:budgetReady?fmtPct(C.debtRatio*100,0):'—'});
+  if(C.rqap) L.push({label:'Coussin pour le congé',state:C.expenses>0?st(true,num(S.comptes)>=C.leaveTotalGap,num(S.comptes)>=C.leaveTotalGap*0.5):'n',value:C.expenses>0?fmtMoney(C.leaveTotalGap):'—'});
+  if(C.kids>0) L.push({label:'Subventions REEE',state:has(S.versReee)?st(true,C.reeeGap===0,num(S.versReee)>0):'n',value:has(S.versReee)?fmtMoney(C.reeeGrants)+'/an':'—'});
+  const prot=[S.testamentA,C.couple?S.testamentB:null,C.kids>0?S.tuteur:null,S.assInvA,C.couple?S.assInvB:null].filter(has);
+  const protOk=prot.length? prot.every(v=>String(v).startsWith('Oui')):null; const protSome=prot.some(v=>String(v).startsWith('Oui'));
+  L.push({label:'Protection juridique',state:protOk===null?'n':st(true,protOk,protSome),value:protOk===null?'—':(protOk?'en place':'incomplète')});
+  if(C.home) L.push({label:'Test de résistance',state:st(true,C.home.passes,C.home.gds<=P.gdsMax+3&&C.home.tds<=P.tdsMax+3),value:'ABD '+fmtPct(C.home.gds,0)});
+  return L;
+}
+
+/* ---------- Priorités (règles) ---------- */
+function prioritiesFor(C){
+  const out=[]; const add=(score,title,detail,tag)=>out.push({score,title,detail,tag});
+  const kidsName = C.kids>1?'les enfants':'l’enfant';
+  if(C.liab.cartes>0) add(100,'Éliminer les soldes de cartes de crédit',`${fmtMoney(C.liab.cartes)} à ${fmtPct(P.tauxCarte,2)} coûtent environ ${fmtMoney(C.cardInterest)} d’intérêts par année. Aucun placement ne bat ce rendement garanti.`,'dettes');
+  if(C.essentials>0&&C.emergencyMonths<C.emergencyTarget) add(C.emergencyMonths<1?95:80,`Compléter le fonds d’urgence (${fmtNum(C.emergencyMonths,1)} mois sur ${C.emergencyTarget})`,`Il manque ${fmtMoney(C.emergencyGap)} pour couvrir ${C.emergencyTarget} mois de dépenses essentielles (${fmtMoney(C.essentials)} par mois). À garder en compte d’épargne à intérêt élevé ou dans un CELI liquide.`,'liquidité');
+  if(C.rqap&&C.expenses>0&&C.leaveTotalGap>0) add(90,'Prévoir le coussin du congé parental',`Pendant le congé du parent A, le revenu net du ménage est estimé à ${fmtMoney(C.leaveMonthlyIncome)} par mois contre ${fmtMoney(C.expenses)} de dépenses : écart de ${fmtMoney(C.leaveMonthlyGap)} par mois, soit ${fmtMoney(C.leaveTotalGap)} sur ${fmtNum(C.rqap.monthsA,1)} mois. Liquidités actuelles : ${fmtMoney(num(S.comptes))}.`,'congé');
+  if(C.rqap&&C.rqap.excess>0) add(70,'Ajuster la répartition des semaines RQAP',`Les semaines parentales demandées dépassent de ${C.rqap.excess} le maximum du régime (${C.rqap.parMax} semaines partageables). Utilisez le simulateur officiel du RQAP pour valider.`,'congé');
+  if(C.kids>0){
+    if(S.nasEnfant==='Non') add(88,`Obtenir le NAS de ${kidsName}`,'Préalable au REEE et aux subventions. Demande en ligne ou à Service Canada avec le certificat de naissance.','enfant');
+    if(S.reeeStatut==='Pas encore ouvert') add(86,'Ouvrir le REEE dès maintenant',`Chaque année sans cotisation reporte seulement une partie des subventions. 2 500 $ par enfant déclenchent ${fmtMoney(P.reeeRepere*(P.sceeTaux+P.iqeeTaux)/100)} de SCEE et d’IQEE, un rendement immédiat de ${fmtPct(P.sceeTaux+P.iqeeTaux,0)}.`,'enfant');
+    else if(has(S.versReee)&&C.reeeGap>0) add(75,'Capturer toutes les subventions REEE',`Ajouter ${fmtMoney(C.reeeGap)} par année (total ${fmtMoney(P.reeeRepere*C.kids)}) pour obtenir le maximum de SCEE et d’IQEE, soit ${fmtMoney(P.reeeRepere*C.kids*(P.sceeTaux+P.iqeeTaux)/100)} par année.`,'enfant');
+    if(S.garderieInscrit==='Non'&&S.garderieType!=='Autre arrangement (famille, nounou)') add(72,'Inscrire l’enfant au guichet unique des services de garde','Les délais pour une place subventionnée dépassent souvent 12 mois. L’inscription se fait dès la naissance sur le Portail d’inscription aux services de garde (ex La Place 0-5).','enfant');
+    if(S.assCollectiveEnfant==='Non') add(78,'Ajouter l’enfant aux assurances collectives et médicaments','Délai habituel de 30 jours après la naissance. Au Québec, chaque personne doit être couverte par un régime d’assurance médicaments (RAMQ ou régime privé).','protection');
+  }
+  const noWill=(S.testamentA&&S.testamentA!=='Oui')||(C.couple&&S.testamentB&&S.testamentB!=='Oui');
+  if(noWill) add(92,'Rédiger ou mettre à jour les testaments et désigner un tuteur',`Au Québec, sans testament, ${isFait(S)?'le conjoint de fait en union parentale hérite du tiers seulement, le reste va aux enfants':'la succession suit les règles du Code civil'}; un enfant mineur ne peut pas recevoir un héritage directement et le Curateur public intervient au-delà de 40 000 $. Le testament nomme le tuteur, crée une fiducie testamentaire et désigne les bénéficiaires des REER et CELI.`,'protection');
+  else if(C.kids>0&&S.tuteur==='Non') add(85,'Désigner un tuteur pour les enfants dans le testament','Sans désignation, un tribunal tranchera. Le tuteur peut être différent du gestionnaire des sommes (fiduciaire).','protection');
+  if((S.mandatA&&S.mandatA!=='Oui')||(C.couple&&S.mandatB&&S.mandatB!=='Oui')) add(60,'Signer les mandats de protection','Sans mandat, l’inaptitude d’un parent déclenche une ouverture de régime de protection devant le tribunal, longue et coûteuse.','protection');
+  if(isFait(S)&&S.unionParentale==='Non') add(84,'Comprendre le régime d’union parentale (en vigueur depuis le 30 juin 2025)','Vous y êtes assujettis automatiquement avec un enfant né depuis cette date : patrimoine commun (résidences, meubles, véhicules), protection de la résidence familiale, prestation compensatoire possible et droit d’hériter du tiers sans testament. Le patrimoine peut être modifié ou écarté par acte notarié (renonciation possible dans les 90 jours de la naissance). Un rendez-vous chez le notaire règle testament, mandat et convention en une visite.','juridique');
+  if(isFait(S)&&S.conventionUP==='À évaluer avec un notaire') add(55,'Évaluer une convention d’union parentale avec un notaire','Utile si l’un des conjoints apporte une mise de fonds ou un bien important : la convention précise ce qui entre dans le patrimoine partagé.','juridique');
+  const invMissing=[S.assInvA,C.couple?S.assInvB:'Oui, par l’employeur'].filter(has).some(v=>v==='Non'||v==='À vérifier');
+  if(invMissing) add(82,'Confirmer la couverture d’assurance invalidité','Le risque financier le plus probable avant 65 ans. Vérifiez le pourcentage du salaire couvert, la définition d’invalidité, le délai de carence et si les prestations sont imposables.','protection');
+  if(has(S.assVieA)&&C.lifeGapA>0) add(74,'Revoir l’assurance vie du parent A',`Besoin estimé ${fmtMoney(C.lifeNeedA)} (${P.multAssVie} fois le revenu plus les dettes, moins la moitié des actifs liquides) contre ${fmtMoney(num(S.assVieA))} en place. Une temporaire 20 ans couvre la période où les enfants dépendent de vous à faible coût.`,'protection');
+  if(C.couple&&has(S.assVieB)&&C.lifeGapB>0) add(73,'Revoir l’assurance vie du parent B',`Besoin estimé ${fmtMoney(C.lifeNeedB)} contre ${fmtMoney(num(S.assVieB))} en place. Même sans salaire, un parent qui s’occupe des enfants a une valeur économique à assurer.`,'protection');
+  if(buys(S)){
+    const closedA=S.celiappStatutA==='Pas encore ouvert', closedB=C.couple&&S.celiappStatutB==='Pas encore ouvert';
+    if(closedA||closedB) add(83,'Ouvrir le CELIAPP de chaque parent admissible',`Les droits (${fmtMoney(P.celiappAnnuel)} par année, report limité à ${fmtMoney(P.celiappReport)}) commencent à l’ouverture. Chaque parent dispose de ${fmtMoney(P.celiappVie)} à vie : la déduction fonctionne comme un REER et le retrait pour l’achat est libre d’impôt.`,'immobilier');
+    else if(C.celiappCapA+C.celiappCapB>0&&has(S.versCeliappA)&&(num(S.versCeliappA)+num(S.versCeliappB))<Math.min(P.celiappAnnuel*(C.couple?2:1),C.celiappCapA+C.celiappCapB)) add(77,'Prioriser le CELIAPP avant le REER pour la mise de fonds',`Capacité restante estimée : ${fmtMoney(C.celiappCapA+C.celiappCapB)}. Le CELIAPP cumule la déduction du REER et le retrait non imposable du CELI; le RAP (jusqu’à ${fmtMoney(P.rapMax)} par personne) peut s’y ajouter pour le même achat.`,'immobilier');
+    if(C.home&&!C.home.passes) add(87,'Le projet immobilier ne passe pas le test de résistance',`ABD ${fmtPct(C.home.gds,0)} et ATD ${fmtPct(C.home.tds,0)} (limites ${P.gdsMax} et ${P.tdsMax}) au taux de qualification de ${fmtPct(C.home.qRate,2)}. Avec la mise de fonds prévue, le prix admissible estimé est d’environ ${fmtMoney(Math.floor(C.home.maxPrice/5000)*5000)}.`,'immobilier');
+    if(C.home&&C.home.insured) add(50,'Mesurer le coût de l’assurance prêt',`Mise de fonds de ${fmtPct(C.home.downPct,1)} : prime SCHL estimée à ${fmtMoney(C.home.premium)} ajoutée au prêt, plus ${fmtMoney(C.home.tvq)} de TVQ payable comptant. Atteindre 20 % évite la prime; 30 ans d’amortissement sont possibles pour un premier acheteur assuré.`,'immobilier');
+    if(C.home&&C.home.passes&&C.home.diff>0&&C.rqap) add(58,'Attendre la fin du congé parental avant de signer',`Le coût mensuel de propriété (${fmtMoney(C.home.ownMonthly)}) dépasse le loyer comparable de ${fmtMoney(C.home.diff)}; pendant le congé, le revenu du ménage est réduit. Verrouiller le projet une fois les deux revenus rétablis réduit le risque.`,'immobilier');
+  }
+  if(C.couple&&C.spousalGap>=8&&has(S.droitsReerA)&&has(S.droitsReerB)){
+    const hi=C.highEarner, lo=hi==='A'?'B':'A';
+    add(68,`Fractionner avec un REER de conjoint cotisé par le parent ${hi}`,`Le parent ${hi} déduit au taux marginal de ${fmtPct(hi==='A'?C.marginalA:C.marginalB,1)} tandis que le parent ${lo} est à ${fmtPct(lo==='A'?C.marginalA:C.marginalB,1)}. La cotisation utilise les droits du parent ${hi}, et le revenu de retraite sera imposé entre les mains du parent ${lo}. Règle d’attribution : attendre trois 31 décembre avant tout retrait.`,'fiscalité');
+    if(C.rqap) add(66,`Reporter les déductions REER du parent en congé`,`Pendant l’année du congé, le taux marginal du parent A baisse. Les cotisations peuvent être faites maintenant et la déduction reportée à une année à revenu normal; le CELI ou le CELIAPP prennent le relais entre-temps.`,'fiscalité');
+  }
+  if(C.car){ if(C.carVerdict==='rembourser') add(62,'Accélérer le remboursement du prêt auto',`Taux de ${fmtPct(C.car.rate,2)} supérieur au rendement central attendu (${fmtPct(C.rendCentral,1)}) : ${fmtMoney(C.car.interest)} d’intérêts restent à payer sur ${num(S.detteAutoMois)} mois. Le remboursement est un rendement garanti.`,'dettes'); else if(C.carVerdict==='investir') add(35,'Conserver le prêt auto au rythme prévu',`Taux de ${fmtPct(C.car.rate,2)} inférieur au rendement attendu : il reste ${fmtMoney(C.car.interest)} d’intérêts, mais les cotisations REEE, CELIAPP et REER produisent davantage. Revoir si le taux est variable.`,'dettes'); }
+  if(C.liab.marge>0) add(79,'Rembourser la marge ou le prêt personnel',`${fmtMoney(C.liab.marge)} à ${fmtPct(C.margeRate,2)} : environ ${fmtMoney(C.margeInterest)} d’intérêts par année, non déductibles.`,'dettes');
+  if(C.expenses>0&&C.netMonthly>0&&C.savingsRate<0.10) add(65,'Automatiser l’épargne le jour de paie',`Taux d’épargne actuel de ${fmtPct(C.savingsRate*100,0)}. Cible : 10 % du revenu net pour commencer, 15 % en vitesse de croisière. Les virements automatiques le jour de paie éliminent la décision.`,'budget');
+  if(C.expenses>0&&C.netMonthly>0&&C.unassigned>200) add(45,'Attribuer l’argent non suivi',`Environ ${fmtMoney(C.unassigned)} par mois ne sont ni dépensés dans le budget déclaré ni épargnés. Un suivi de 60 jours révèle où ils vont.`,'budget');
+  if(C.expenses>0&&C.capacity<0) add(89,'Rétablir l’équilibre du budget',`Les dépenses dépassent le revenu net et les allocations de ${fmtMoney(-C.capacity)} par mois. Les postes variables (restaurants, abonnements, divers) sont les premiers leviers; le logement et l’auto les plus lourds.`,'budget');
+  if(C.side&&C.side.gross>0){ if(S.autorisationEmployeur!=='Oui, obtenue'&&S.autorisationEmployeur!=='Ne s’applique pas') add(64,'Obtenir l’autorisation de l’employeur avant tout revenu secondaire','Clauses d’exclusivité, de conflit d’intérêts et de confidentialité à vérifier par écrit. Ne jamais utiliser les ressources de l’employeur.','revenus'); add(40,'Budgéter le revenu secondaire après impôt',`${fmtMoney(C.side.gross)} brut par année valent environ ${fmtMoney(C.side.net)} après impôt au taux marginal de ${fmtPct(C.side.rate,1)}. Réserver ce pourcentage dès l’encaissement; inscription TPS/TVQ obligatoire au-delà de 30 000 $ de ventes sur quatre trimestres; acomptes provisionnels possibles.`,'revenus'); }
+  if(num(S.salaireCibleA)>num(S.revenuA)) add(42,'Préparer le dossier de rémunération',`Une hausse de ${fmtMoney(num(S.salaireCibleA)-num(S.revenuA))} vaut environ ${fmtMoney(C.raiseNetA)} nets par année, récurrents et sans heures supplémentaires. Documenter résultats, économies et responsabilités.`,'revenus');
+  if(C.kids>0&&C.rqap) add(30,'Anticiper le décalage des allocations',`L’ACE de juillet 2027 à juin 2028 sera calculée sur le revenu de 2026 (année du congé) : elle augmentera temporairement, puis redescendra. Estimation sur revenu habituel : ${fmtMoney(C.allocAnnualEst/12)} par mois; sur revenu de l’année du congé : ${fmtMoney((C.aceLeave+C.afLeave)/12)} par mois.`,'enfant');
+  out.sort((a,b)=>b.score-a.score);
+  return out.slice(0,10).map((p,i)=>({...p,rank:i+1}));
+}
+</script>
+<script>
+/* ---------- Graphiques SVG (réutilisés dans le PDF) ---------- */
+const PALETTE=['#136F63','#2B63C9','#B97E00','#7A4FBF','#D9463B','#1DA383','#5E6B82','#E0A526','#4C5A75','#7FA6F0','#8C6A2F','#2F855A'];
+const SVGFONT='Roboto, Helvetica, Arial, sans-serif';
+const sv=x=>esc(String(x).replace(/[\u202F\u00A0]/g,' '));
+function svgDonut(rows, o={}){
+  const w=o.w||320,h=o.h||200,cx=100,cy=100,R=84,r=52,text=o.text||'#13213A',sub=o.sub||'#4C5A75';
+  const total=rows.reduce((a,x)=>a+x.v,0); if(total<=0) return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}"><text x="${w/2}" y="${h/2}" text-anchor="middle" font-family="${SVGFONT}" font-size="12" fill="${sub}">Aucune donnée</text></svg>`;
+  let a0=-Math.PI/2, paths='';
+  rows.forEach((x,i)=>{ if(x.v<=0) return; const a1=a0+x.v/total*2*Math.PI; const large=a1-a0>Math.PI?1:0;
+    const p=[cx+R*Math.cos(a0),cy+R*Math.sin(a0),cx+R*Math.cos(a1),cy+R*Math.sin(a1),cx+r*Math.cos(a1),cy+r*Math.sin(a1),cx+r*Math.cos(a0),cy+r*Math.sin(a0)].map(v=>v.toFixed(2));
+    paths+=`<path d="M${p[0]} ${p[1]} A${R} ${R} 0 ${large} 1 ${p[2]} ${p[3]} L${p[4]} ${p[5]} A${r} ${r} 0 ${large} 0 ${p[6]} ${p[7]} Z" fill="${PALETTE[i%PALETTE.length]}"/>`; a0=a1; });
+  const legend=rows.filter(x=>x.v>0).slice(0,8).map((x,i)=>{ const idx=rows.indexOf(x); const y=24+i*21; return `<rect x="206" y="${y-9}" width="10" height="10" rx="2" fill="${PALETTE[idx%PALETTE.length]}"/><text x="222" y="${y}" font-family="${SVGFONT}" font-size="10.5" fill="${text}">${sv(x.label.length>14?x.label.slice(0,13)+'…':x.label)}</text><text x="${w-4}" y="${y}" text-anchor="end" font-family="${SVGFONT}" font-size="10.5" fill="${sub}">${Math.round(x.v/total*100)} %</text>`; }).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">${paths}<text x="${cx}" y="${cy-4}" text-anchor="middle" font-family="${SVGFONT}" font-size="15" font-weight="700" fill="${text}">${sv(fmtMoney(total))}</text><text x="${cx}" y="${cy+14}" text-anchor="middle" font-family="${SVGFONT}" font-size="10" fill="${sub}">par mois</text>${legend}</svg>`;
+}
+function svgBars(items, o={}){
+  const w=o.w||420,rowH=22,pad=4,labelW=150,h=items.length*(rowH+pad)+10,text=o.text||'#13213A',sub=o.sub||'#4C5A75',max=Math.max(1,...items.map(x=>Math.abs(x.v)));
+  const bars=items.map((x,i)=>{ const y=5+i*(rowH+pad); const bw=Math.max(0,Math.abs(x.v)/max*(w-labelW-80)); const col=x.color||(x.v<0?'#D9463B':'#136F63');
+    return `<text x="0" y="${y+15}" font-family="${SVGFONT}" font-size="10.5" fill="${text}">${sv(x.label)}</text><rect x="${labelW}" y="${y+3}" width="${bw.toFixed(1)}" height="${rowH-6}" rx="3" fill="${col}"/><text x="${labelW+bw+6}" y="${y+15}" font-family="${SVGFONT}" font-size="10.5" fill="${sub}">${sv(fmtMoney(x.v))}</text>`; }).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">${bars}</svg>`;
+}
+function svgLines(series, o={}){
+  const w=o.w||460,h=o.h||220,ml=58,mr=14,mt=14,mb=28,text=o.text||'#13213A',sub=o.sub||'#4C5A75',grid=o.grid||'#D8DEE8';
+  const N=Math.max(...series.map(s=>s.points.length-1)); const maxV=Math.max(1,...series.flatMap(s=>s.points));
+  const x=i=>ml+i/N*(w-ml-mr), y=v=>mt+(1-v/maxV)*(h-mt-mb);
+  let g=''; for(let k=0;k<=4;k++){ const v=maxV*k/4; g+=`<line x1="${ml}" x2="${w-mr}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="${grid}" stroke-width="1"/><text x="${ml-6}" y="${(y(v)+3.5).toFixed(1)}" text-anchor="end" font-family="${SVGFONT}" font-size="9.5" fill="${sub}">${sv(fmtNum(v/1000,0))} k</text>`; }
+  const step=N>12?5:(N>6?2:1); for(let i=0;i<=N;i+=step){ g+=`<text x="${x(i).toFixed(1)}" y="${h-10}" text-anchor="middle" font-family="${SVGFONT}" font-size="9.5" fill="${sub}">${i===0?'auj.':i+' ans'}</text>`; }
+  const lines=series.map((s,si)=>`<polyline fill="none" stroke="${s.color||PALETTE[si]}" stroke-width="2.2" stroke-linejoin="round" points="${s.points.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')}"/>`).join('');
+  const leg=series.map((s,si)=>`<rect x="${ml+si*120}" y="${h-2}" width="10" height="3" fill="${s.color||PALETTE[si]}"/><text x="${ml+si*120+14}" y="${h+2}" font-family="${SVGFONT}" font-size="9.5" fill="${text}">${sv(s.label)}</text>`).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h+8}" width="${w}" height="${h+8}">${g}${lines}${leg}</svg>`;
+}
+function uiChartOpts(){ const dark=document.documentElement.getAttribute('data-theme')==='dark'; return dark?{text:'#E9EDF5',sub:'#AEB9CE',grid:'#283552'}:{text:'#13213A',sub:'#4C5A75',grid:'#D8DEE8'}; }
+
+/* ---------- Aperçus en direct par étape ---------- */
+let C=compute();
+const kv=(label,val,sub)=>`<div><span>${esc(label)}</span><b>${val}</b>${sub?`<span>${esc(sub)}</span>`:''}</div>`;
+const LIVE={
+  famille(C){
+    const A=C.inc.A,B=C.inc.B; let html=`<h3>Estimations en direct</h3><div class="live-grid">`;
+    html+=kv('Revenu net annuel estimé, parent A',fmtMoney(A.net),`taux marginal ${fmtPct(A.marginal,1)}`);
+    if(C.couple) html+=kv('Revenu net annuel estimé, parent B',fmtMoney(B.net),`taux marginal ${fmtPct(B.marginal,1)}`);
+    html+=kv('Revenu net mensuel du ménage',fmtMoney(C.netMonthlyEst),'avant allocations');
+    if(C.kids>0) html+=kv('Allocations estimées (ACE + Allocation famille)',fmtMoney(C.allocAnnualEst/12)+'/mois',`revenu familial net rajusté ${fmtMoney(C.afniNow)}`);
+    html+='</div>';
+    if(C.rqap){ const r=C.rqap; html+=`<h3 style="margin-top:14px">Congé parental (${r.base?'régime de base':'régime particulier'})</h3><table>
+      <tr><td>Prestations brutes, parent A (${r.semA} sem.)</td><td>${fmtMoney(r.grossA)}</td></tr>
+      ${C.couple?`<tr><td>Prestations brutes, parent B (${r.semB} sem.)</td><td>${fmtMoney(r.grossB)}</td></tr>`:''}
+      ${r.topup>0?`<tr><td>Complément de l’employeur (${r.topupWeeks} sem.)</td><td>${fmtMoney(r.topup)}</td></tr>`:''}
+      <tr><td>Revenu net du ménage pendant le congé du parent A</td><td>${fmtMoney(r.monthlyDuringA)}/mois</td></tr>
+      <tr><td>Manque à gagner net total du congé</td><td>${fmtMoney(r.gapTotal)}</td></tr>
+      ${r.excess>0?`<tr><td style="color:var(--rouge)">Semaines parentales en trop</td><td style="color:var(--rouge)">${r.excess}</td></tr>`:''}
+      ${r.bonusOk?`<tr><td>Semaines bonus partageables activées</td><td>oui</td></tr>`:''}</table>`; }
+    return html;
+  },
+  budget(C){
+    const o=uiChartOpts(); let html=`<h3>Lecture du budget</h3><div class="live-grid">`;
+    html+=kv('Revenu disponible',fmtMoney(C.income)+'/mois','net + allocations');
+    html+=kv('Dépenses totales',fmtMoney(C.expenses)+'/mois',`essentielles ${fmtMoney(C.essentials)}`);
+    html+=kv('Capacité d’épargne',fmtMoney(C.capacity)+'/mois',C.unassigned>0?`${fmtMoney(C.unassigned)} non attribués`:'');
+    html+=kv('Taux d’épargne déclaré',fmtPct(C.savingsRate*100,0),'cible 10 à 15 %');
+    html+=kv('Poids du logement',fmtPct(C.housingRatio*100,0),'du revenu net');
+    html+=kv('Fonds d’urgence',fmtNum(C.emergencyMonths,1)+' mois','de dépenses essentielles');
+    html+='</div>';
+    if(C.garderie) html+=`<p class="small muted" style="margin:12px 0 0">Garderie : ${fmtMoney(C.garderie.brut)} brut par mois, coût net estimé ${fmtMoney(C.garderie.net)} après crédit du Québec et déduction fédérale.</p>`;
+    if(C.rqap&&C.expenses>0) html+=`<p class="small" style="margin:12px 0 0">Pendant le congé : revenu estimé ${fmtMoney(C.leaveMonthlyIncome)} par mois, écart ${fmtMoney(C.leaveMonthlyGap)} par mois, coussin requis ${fmtMoney(C.leaveTotalGap)}.</p>`;
+    if(C.expenses>0) html+=`<div class="live-chart" style="margin-top:12px;max-width:380px">${svgDonut(C.expenseRows.map(r=>({label:r.short,v:r.v})),o)}</div>`;
+    return html;
+  },
+  bilan(C){
+    const o=uiChartOpts(); let html=`<h3>Bilan</h3><div class="live-grid">`;
+    html+=kv('Actifs',fmtMoney(C.totalAssets)); html+=kv('Passifs',fmtMoney(C.totalLiab)); html+=kv('Patrimoine net',fmtMoney(C.netWorth)); html+=kv('Actifs investissables',fmtMoney(C.investable),'hors REEE, véhicule, propriété');
+    html+='</div>';
+    if(C.car) html+=`<p class="small" style="margin:12px 0 0">Prêt auto : paiement estimé ${fmtMoney(C.car.payment)} par mois, ${fmtMoney(C.car.interest)} d’intérêts restants. ${C.carVerdict==='rembourser'?'Taux supérieur au rendement attendu : accélérer le remboursement.':(C.carVerdict==='investir'?'Taux inférieur au rendement attendu : conserver le rythme et investir.':'Taux proche du rendement attendu : le remboursement reste un rendement garanti.')}</p>`;
+    if(C.liab.cartes>0) html+=`<p class="small" style="margin:8px 0 0;color:var(--rouge)">Cartes de crédit : environ ${fmtMoney(C.cardInterest)} d’intérêts par année. Priorité absolue.</p>`;
+    const items=[{label:'Liquidités',v:C.assets.liquid},{label:'CELI',v:C.assets.celi},{label:'CELIAPP',v:C.assets.celiapp},{label:'REER',v:C.assets.reer},{label:'REEE',v:C.assets.reee},{label:'Non enregistré',v:C.assets.placements},{label:'Véhicules',v:C.assets.vehicule}].filter(x=>x.v>0);
+    if(C.assets.propriete>0) items.push({label:'Propriété',v:C.assets.propriete});
+    Object.entries({auto:'Prêt auto',cartes:'Cartes',marge:'Marge / prêt',autres:'Autres dettes',hypotheque:'Hypothèque'}).forEach(([k,l])=>{ if(C.liab[k]>0) items.push({label:l,v:-C.liab[k]}); });
+    if(items.length) html+=`<div class="live-chart" style="margin-top:12px;max-width:520px">${svgBars(items,o)}</div>`;
+    return html;
+  },
+  droits(C){
+    let html=`<h3>Valeur des cotisations prévues</h3><table>`;
+    html+=`<tr><td>Taux marginal estimé, parent A</td><td>${fmtPct(C.marginalA,1)}</td></tr>`;
+    if(C.couple) html+=`<tr><td>Taux marginal estimé, parent B</td><td>${fmtPct(C.marginalB,1)}</td></tr>`;
+    html+=`<tr><td>Capacité CELIAPP restante estimée</td><td>${fmtMoney(C.celiappCapA+C.celiappCapB)}</td></tr>`;
+    if(C.kids>0) html+=`<tr><td>Subventions REEE sur la cotisation prévue (plan d’action)</td><td>${fmtMoney(C.reeeGrants)}/an</td></tr>`;
+    html+=`</table><p class="small muted" style="margin-top:10px">Les économies d’impôt du REER et du CELIAPP se calculent à l’étape Plan d’action, à partir des montants que vous y inscrirez.</p>`;
+    return html;
+  },
+  protection(C){
+    let html=`<h3>Besoin d’assurance vie (estimation simplifiée)</h3><table>`;
+    html+=`<tr><td>Parent A : besoin estimé</td><td>${fmtMoney(C.lifeNeedA)}</td></tr><tr><td>Parent A : écart avec la couverture déclarée</td><td>${fmtMoney(C.lifeGapA)}</td></tr>`;
+    if(C.couple) html+=`<tr><td>Parent B : besoin estimé</td><td>${fmtMoney(C.lifeNeedB)}</td></tr><tr><td>Parent B : écart</td><td>${fmtMoney(C.lifeGapB)}</td></tr>`;
+    html+=`</table><p class="small muted" style="margin-top:10px">Règle utilisée : ${P.multAssVie} fois le revenu brut plus les dettes, moins la moitié des actifs liquides. Une analyse de besoins complète tient compte des études des enfants, du revenu du survivant et des prestations de survivant du RRQ.</p>`;
+    return html;
+  },
+  revenus(C){
+    let html=`<h3>Impact après impôt</h3><table>`;
+    if(num(S.salaireCibleA)>0) html+=`<tr><td>Hausse visée, parent A : valeur nette annuelle</td><td>${fmtMoney(C.raiseNetA)}</td></tr>`;
+    if(C.couple&&num(S.salaireCibleB)>0) html+=`<tr><td>Hausse visée, parent B : valeur nette annuelle</td><td>${fmtMoney(C.raiseNetB)}</td></tr>`;
+    if(C.side) html+=`<tr><td>Revenu secondaire brut</td><td>${fmtMoney(C.side.gross)}</td></tr><tr><td>Impôt estimé au taux marginal (${fmtPct(C.side.rate,1)})</td><td>${fmtMoney(C.side.tax)}</td></tr><tr><td>Net approximatif, avant cotisations RRQ et frais</td><td>${fmtMoney(C.side.net)}</td></tr>`;
+    html+=`</table><p class="small muted" style="margin-top:10px">Le travail autonome ajoute la part « employeur » des cotisations au RRQ et au RQAP, l’inscription TPS/TVQ au-delà de 30 000 $ de ventes et, souvent, des acomptes provisionnels.</p>`;
+    return html;
+  },
+  immobilier(C){
+    if(!C.home) return `<h3>Analyse du projet</h3><p class="small muted">Inscrivez le prix cible pour voir le paiement, le test de résistance et la comparaison location et achat.</p>`;
+    const h=C.home; let html=`<h3>Analyse du projet</h3><div class="live-grid">`;
+    html+=kv('Paiement hypothécaire',fmtMoney(h.payment)+'/mois',`${fmtPct(h.rate,2)}, ${h.years} ans`);
+    html+=kv('Coût mensuel de propriété',fmtMoney(h.ownMonthly),'paiement, taxes, assurance, entretien, copropriété');
+    html+=kv('Test de résistance',(h.passes?'réussi':'échoué')+`, ABD ${fmtPct(h.gds,0)} / ATD ${fmtPct(h.tds,0)}`,`taux de qualification ${fmtPct(h.qRate,2)}`);
+    html+=kv('Mise de fonds',fmtPct(h.downPct,1),h.insured?`prime SCHL ${fmtMoney(h.premium)} + TVQ ${fmtMoney(h.tvq)}`:'aucune assurance prêt requise');
+    html+=kv('Droits de mutation',fmtMoney(h.dm),h.dmCredit>0?`crédit premier acheteur estimé ${fmtMoney(h.dmCredit)}`:'');
+    html+=kv('Frais de clôture nets',fmtMoney(h.closingNet),'après crédits premier acheteur');
+    html+='</div>';
+    html+=`<table style="margin-top:12px"><tr><td>Patrimoine après ${h.N} ans si vous achetez (valeur nette de la propriété, frais de vente déduits)</td><td>${fmtMoney(h.buyWealth)}</td></tr><tr><td>Patrimoine après ${h.N} ans si vous louez et investissez mise de fonds, frais et différence mensuelle</td><td>${fmtMoney(h.rentWealth)}</td></tr><tr><td>Prix maximal estimé selon le test de résistance</td><td>${fmtMoney(Math.floor(h.maxPrice/5000)*5000)}</td></tr></table>`;
+    return html;
+  },
+  projections(C){
+    const o=uiChartOpts(); const pr=C.proj; let html=`<h3>Actifs investissables projetés (nets d’inflation à ${fmtPct(pr.infl*100,1)})</h3><table><tr><td>Horizon</td>${pr.rates.map(r=>`<td>${fmtPct(r,0)}</td>`).join('')}</tr>`;
+    pr.rows.forEach(row=>{ html+=`<tr><td>${row.N} ans${row.N===pr.yearsToRet?' (retraite)':''}</td>${row.vals.map(v=>`<td>${fmtMoney(v.real)}</td>`).join('')}</tr>`; });
+    html+=`</table><p class="small muted" style="margin:10px 0 0">Départ : ${fmtMoney(C.investable)} investis, plus ${fmtMoney(C.contribAnnualInvest)} par année selon le plan d’action (hors REEE). Les montants REER restent imposables au retrait.</p>`;
+    const yrs=Math.max(...pr.horizons); const series=pr.rates.map((r,i)=>({label:`${fmtPct(r,0)}`,color:[ '#5E6B82','#136F63','#B97E00'][i],points:Array.from({length:yrs+1},(_,n)=>fv(r/100,n,C.investable,C.contribAnnualInvest)/Math.pow(1+pr.infl,n))}));
+    html+=`<div class="live-chart" style="margin-top:12px">${svgLines(series,o)}</div>`;
+    return html;
+  },
+  plan(C){
+    let html=`<h3>Cohérence du plan</h3><table>`;
+    html+=`<tr><td>Total des cotisations et remboursements prévus</td><td>${fmtMoney(C.contribAnnual)}/an</td></tr>`;
+    html+=`<tr><td>Capacité d’épargne selon le budget</td><td>${fmtMoney(C.capacity*12)}/an</td></tr>`;
+    html+=`<tr><td style="${C.planVsCapacity<0?'color:var(--rouge)':''}">${C.planVsCapacity<0?'Dépassement de la capacité':'Marge restante'}</td><td style="${C.planVsCapacity<0?'color:var(--rouge)':''}">${fmtMoney(Math.abs(C.planVsCapacity))}/an</td></tr>`;
+    html+=`<tr><td>Économie d’impôt estimée des cotisations REER</td><td>${fmtMoney(C.reerValueA+C.reerValueB)}</td></tr>`;
+    html+=`<tr><td>Économie d’impôt estimée des cotisations CELIAPP</td><td>${fmtMoney(C.celiappValueA+C.celiappValueB)}</td></tr>`;
+    if(C.kids>0) html+=`<tr><td>Subventions REEE déclenchées</td><td>${fmtMoney(C.reeeGrants)}</td></tr>`;
+    html+=`<tr><td>Fonds d’urgence visé (${C.emergencyTarget} mois)</td><td>${fmtMoney(C.emergencyTargetAmt)}</td></tr></table>`;
+    return html;
+  }
+};
+function renderLive(){ const sec=SECTIONS[current]; const el=document.getElementById('live'); if(!el) return; const fn=LIVE[sec.id]; if(!fn){ el.innerHTML=''; return; } el.className='live'; el.innerHTML=fn(C); }
+
+/* ---------- Tableau de bord ---------- */
+function dashHTML(C){
+  const g=globalStats(); const miss=missingFields();
+  const kpi=(l,v,s)=>`<div class="kpi"><span>${esc(l)}</span><b>${v}</b>${s?`<small>${esc(s)}</small>`:''}</div>`;
+  let html=`<div class="dash-card"><h3>Indicateurs <span class="num muted">${g.pct}${NNBSP}%</span></h3><div class="kpis">`;
+  html+=kpi('Revenu net mensuel',C.netMonthly>0?fmtMoney(C.netMonthly):'—',C.allocMonthly>0?`+ ${fmtMoney(C.allocMonthly)} d’allocations`:'');
+  html+=kpi('Dépenses mensuelles',C.expenses>0?fmtMoney(C.expenses):'—',C.essentials>0?`${fmtMoney(C.essentials)} essentielles`:'');
+  html+=kpi('Capacité d’épargne',C.income>0?fmtMoney(C.capacity):'—',C.income>0?`déclarée ${fmtMoney(C.savings)}`:'');
+  html+=kpi('Patrimoine net',C.totalAssets>0||C.totalLiab>0?fmtMoney(C.netWorth):'—',C.investable>0?`${fmtMoney(C.investable)} investissables`:'');
+  html+=`</div></div>`;
+  html+=`<div class="dash-card"><h3>Feux</h3><div class="lights">${C.lights.map(l=>`<div class="light ${l.state}"><i></i><span>${esc(l.label)}</span><b>${esc(l.value)}</b></div>`).join('')}</div></div>`;
+  html+=`<div class="dash-card"><h3>Priorités</h3>${C.priorities.length?`<ol class="prio">${C.priorities.slice(0,5).map(p=>`<li><em>${String(p.rank).padStart(2,'0')}</em><span>${esc(p.title)}</span></li>`).join('')}</ol>`:'<p class="prio-empty">Les priorités apparaissent dès que les étapes Budget, Bilan et Droits sont remplies.</p>'}</div>`;
+  html+=`<div class="dash-card">${g.pct===100?`<button class="btn primary" type="button" data-go="${SECTIONS.length-1}">Générer le PDF</button>`:`<p class="small muted" style="margin:0 0 10px">${miss.length} réponse${miss.length>1?'s':''} requise${miss.length>1?'s':''} avant le PDF.</p><button class="btn" type="button" data-next-missing="1">Aller à la prochaine question</button>`}</div>`;
+  return html;
+}
+function renderDash(){ const h=dashHTML(C); const d=document.getElementById('dash'); if(d) d.innerHTML=h; const m=document.getElementById('dashMobile'); if(m) m.innerHTML=h; }
+
+/* ---------- Étape de génération ---------- */
+function generateHTML(){
+  const g=globalStats(); const miss=missingFields(); const circ=2*Math.PI*56;
+  const ring=`<div class="gen-ring"><svg viewBox="0 0 132 132"><circle class="track" cx="66" cy="66" r="56"></circle><circle class="bar" cx="66" cy="66" r="56" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${(circ*(1-g.pct/100)).toFixed(1)}"></circle></svg><div class="val">${g.pct}${NNBSP}%</div></div>`;
+  const ready=g.pct===100;
+  const missHtml = ready?'' : `<ul class="missing-list">${miss.slice(0,8).map(m=>`<li><button type="button" data-goto-field="${m.f.k}" data-sec="${m.sec}"><span>${esc(m.f.l)}</span><span class="muted">${esc(SECTIONS[m.sec].short)}</span></button></li>`).join('')}</ul>${miss.length>8?`<p class="missing-more">et ${miss.length-8} autre${miss.length-8>1?'s':''}…</p>`:''}`;
+  return `<div class="step-kicker">Étape 10 sur 10</div><h2>Générer le plan</h2>
+  <div class="gen-hero" style="margin-top:14px">${ring}<div class="gen-text"><h2 style="font-size:19px">${ready?'Toutes les questions requises sont répondues.':`${g.done} réponses sur ${g.req}.`}</h2><p class="muted">${ready?'Le PDF reprend vos réponses, les indicateurs, les priorités, les projections et une feuille de route de 12 mois. Il est produit sur cet appareil.':'Le PDF se débloque quand toutes les questions requises sont répondues. Un 0 est une réponse valide; les champs facultatifs peuvent rester vides.'}</p>${missHtml}</div></div>
+  <div class="gen-actions">
+    <button class="btn primary" type="button" id="btnPdf" ${ready?'':'disabled'}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>Télécharger le PDF</button>
+    <button class="btn" type="button" id="btnPdfOpen" ${ready?'':'disabled'}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>Ouvrir dans un onglet</button>
+  </div>
+  <div class="status" id="pdfStatus"></div>
+  <p class="small muted">Sur iPhone ou iPad : « Ouvrir dans un onglet », puis Partager et Enregistrer dans Fichiers. Le PDF contient vos renseignements financiers; retirez-les avant de le transmettre à un service externe.</p>
+  <h3 style="margin-top:22px">Faire réviser le plan par Claude</h3>
+  <p class="small muted">Le mandat ci-dessous demande une analyse critique à partir de vos réponses (sans votre nom). Copiez-le dans Claude avec le PDF joint, ou tel quel.</p>
+  <pre class="mandate" id="mandateText">${esc(mandateText())}</pre>
+  <div class="tools">
+    <button class="btn" type="button" id="btnMandate">Copier le mandat et mes données</button>
+    <button class="btn" type="button" id="btnExport">Exporter mes réponses (JSON)</button>
+    <button class="btn" type="button" id="btnImport">Importer des réponses</button>
+    <button class="btn danger" type="button" id="btnReset">Effacer mes données</button>
+  </div>
+  <input type="file" id="fileImport" accept="application/json,.json" class="hidden">
+  <div class="panel-foot"><button class="btn ghost" type="button" data-go="${current-1}">← Précédent</button><span class="small muted">Prochaine révision du plan : ${esc(S.revue||'à définir')}</span></div>`;
+}
+function mandateText(){
+  return `Agis comme un planificateur financier et fiscaliste spécialisé en fiscalité québécoise et canadienne. Révise ce plan de match financier familial daté du ${dateFR()}, produit avec l’outil « Plan de match financier, jeune famille Québec 2026 ». Les données du ménage suivent en JSON.
+
+Vérifie auprès des sources officielles (canada.ca, revenuquebec.ca, retraitequebec.gouv.qc.ca, rqap.gouv.qc.ca, quebec.ca) les paramètres 2026 : plafonds CELI, REER et CELIAPP, SCEE et IQEE, ACE et Allocation famille, RQAP, paliers d’impôt, droits de mutation et crédits pour premier acheteur. Distingue clairement les faits, les hypothèses et les données manquantes.
+
+Produis : 1) un budget mensuel avant et pendant le congé parental; 2) l’ordre de priorité des cotisations selon les droits réels et les taux marginaux de chaque conjoint; 3) la comparaison remboursement des dettes contre placement selon les taux; 4) des scénarios de revenu secondaire après impôts, cotisations et frais; 5) la comparaison location et achat avec les coûts complets et le test de résistance; 6) des projections prudente, centrale et optimiste à 5, 10 et 20 ans, nettes d’inflation; 7) les risques et protections familiales (assurances, testaments, mandats, union parentale ou régime matrimonial); 8) un plan d’action mesurable sur 12 mois.
+
+Ne présume d’aucun droit de cotisation, d’aucune admissibilité ni d’aucun rendement garanti. Signale toute incohérence dans les données, cite les sources avec leur date et ne recommande aucune activité non déclarée.`;
+}
+</script>
+<script>
+/* ---------- PDF ---------- */
+const PDF={ink:'#13213A',ink2:'#4C5A75',ink3:'#7A869E',line:'#D8DEE8',pine:'#136F63',pineSoft:'#E1F0EC',honey:'#B97E00',honeySoft:'#FBF0D3',rouge:'#B3261E',rougeSoft:'#F9E2DF',paper:'#F4F6F9',green:'#1DA383',yellow:'#E0A526',red:'#D9463B',grey:'#C5CDDA'};
+const LAYOUT_CLEAN={hLineWidth:(i,node)=>i===0||i===node.table.body.length?0:0.6,vLineWidth:()=>0,hLineColor:()=>PDF.line,paddingLeft:()=>6,paddingRight:()=>6,paddingTop:()=>4,paddingBottom:()=>4};
+const LAYOUT_NONE={hLineWidth:()=>0,vLineWidth:()=>0,paddingLeft:()=>0,paddingRight:()=>0,paddingTop:()=>0,paddingBottom:()=>0};
+const LAYOUT_XS={hLineWidth:(i,node)=>i===0||i===node.table.body.length?0:0.4,vLineWidth:()=>0,hLineColor:()=>PDF.line,paddingLeft:()=>3,paddingRight:()=>3,paddingTop:()=>1.6,paddingBottom:()=>1.6};
+const twoCol=(rows)=>{ const h=Math.ceil(rows.length/2); const t=r=>({width:'*',table:{widths:['*',92],body:r.map(x=>[{text:x[0],style:'cellL'},{text:x[1],style:'cellR',bold:!!x[2]}])},layout:LAYOUT_CLEAN}); return {columns:[t(rows.slice(0,h)),t(rows.slice(h))],columnGap:16,margin:[0,0,0,8]}; };
+const LAYOUT_TILES={hLineWidth:()=>0,vLineWidth:()=>0,paddingLeft:()=>10,paddingRight:()=>10,paddingTop:()=>8,paddingBottom:()=>8};
+function sanitizePdf(o){ if(typeof o==='string') return o.replace(/\u202F/g,'\u00A0').replace(/\u2009/g,'\u00A0'); if(Array.isArray(o)) return o.map(sanitizePdf); if(o&&typeof o==='object'){ const r={}; for(const k in o){ r[k]= k==='svg'?o[k]:sanitizePdf(o[k]); } return r; } return o; }
+const H2=(t)=>({stack:[{text:t,style:'h2'},{canvas:[{type:'line',x1:0,y1:0,x2:60,y2:0,lineWidth:2.5,lineColor:PDF.pine}],margin:[0,3,0,10]}]});
+const H3=(t,m)=>({text:t,style:'h3',margin:m||[0,10,0,5]});
+const para=(t,m)=>({text:t,style:'body',margin:m||[0,0,0,6]});
+const smallNote=(t)=>({text:t,style:'small',margin:[0,4,0,8]});
+const kvTable=(rows,widths)=>({table:{widths:widths||['*',110],body:rows.map(r=>[{text:r[0],style:'cellL'},{text:r[1],style:'cellR',bold:!!r[2]}])},layout:LAYOUT_CLEAN,margin:[0,0,0,8]});
+const callout=(t,kind)=>({unbreakable:true,table:{widths:['*'],body:[[{text:t,style:'body',margin:[8,6,8,6]}]]},layout:{hLineWidth:()=>0,vLineWidth:(i)=>i===0?3:0,vLineColor:()=>kind==='warn'?PDF.honey:(kind==='alert'?PDF.rouge:PDF.pine),paddingLeft:()=>8,paddingRight:()=>6,paddingTop:()=>2,paddingBottom:()=>2,fillColor:()=>kind==='warn'?PDF.honeySoft:(kind==='alert'?PDF.rougeSoft:PDF.pineSoft)},margin:[0,4,0,10]});
+const lightDot=(state)=>({canvas:[{type:'ellipse',x:5,y:6,r1:4.5,r2:4.5,color:state==='g'?PDF.green:(state==='y'?PDF.yellow:(state==='r'?PDF.red:PDF.grey))}],width:12});
+function statusColor(v){ v=String(v||''); if(/^oui/i.test(v)) return PDF.green; if(/^non$/i.test(v)||/^non\b/i.test(v)&&!/applicable|admissible|applique/i.test(v)) return PDF.red; if(/vérifier|évaluer|pas encore/i.test(v)) return PDF.honey; return PDF.ink2; }
+function tile(label,value,sub){ return {stack:[{text:label,style:'tileL'},{text:value,style:'tileV'},sub?{text:sub,style:'tileS'}:{text:'',fontSize:1}],fillColor:PDF.pineSoft}; }
+function waterfall(C){
+  const rows=[]; const couple=C.couple;
+  if(C.liab.cartes>0) rows.push(['Soldes de cartes de crédit',fmtMoney(C.liab.cartes),`Rendement garanti de ${fmtPct(P.tauxCarte,2)}.`]);
+  if(C.emergencyGap>0) rows.push([`Fonds d’urgence jusqu’à ${C.emergencyTarget} mois`,fmtMoney(C.emergencyGap),'Compte d’épargne à intérêt élevé ou CELI liquide. Aucun risque de marché.']);
+  if(C.kids>0) rows.push([`REEE : ${fmtMoney(P.reeeRepere)} par enfant`,fmtMoney(P.reeeRepere*C.kids),`Déclenche ${fmtMoney(P.reeeRepere*C.kids*(P.sceeTaux+P.iqeeTaux)/100)} de SCEE et d’IQEE par année (${fmtPct(P.sceeTaux+P.iqeeTaux,0)} immédiat).`]);
+  if(buys(S)&&(C.celiappCapA+C.celiappCapB)>0) rows.push(['CELIAPP des deux parents admissibles',fmtMoney(Math.min(P.celiappAnnuel*(couple?2:1),C.celiappCapA+C.celiappCapB)),'Déduction comme un REER, retrait non imposable pour l’achat. Le RAP peut s’y ajouter.']);
+  const hiRate=Math.max(C.marginalA,C.marginalB), hi=C.highEarner;
+  if(hiRate>=36) rows.push([`REER du parent ${hi} (taux marginal ${fmtPct(hiRate,1)})${couple&&C.spousalGap>=8?', en REER de conjoint':''}`,fmtMoney(hi==='A'?num(S.versReerA):num(S.versReerB))||'selon capacité',`Chaque 1 000 $ rapporte environ ${fmtMoney(hiRate*10)} d’impôt. Réinvestir le remboursement.`]);
+  rows.push(['CELI des deux parents',fmtMoney(num(S.versCeliA)+(couple?num(S.versCeliB):0))||'selon capacité',hiRate<36?'À taux marginal modéré, le CELI précède le REER : flexibilité totale et croissance libre d’impôt.':'Croissance libre d’impôt et retraits sans conséquence sur les allocations.']);
+  if(C.car&&C.carVerdict==='rembourser') rows.push(['Remboursement accéléré du prêt auto',fmtMoney(C.liab.auto),`Taux ${fmtPct(C.car.rate,2)} supérieur au rendement attendu.`]);
+  if(hiRate<36) rows.push([`REER du parent ${hi}`,'selon capacité','Après le CELI, ou reporter la déduction à une année de revenu plus élevé.']);
+  rows.push(['Placements non enregistrés','surplus','Seulement une fois les comptes enregistrés remplis.']);
+  return {table:{widths:[18,'*',80,'*'],body:[[{text:'#',style:'th'},{text:'Destination',style:'th'},{text:'Montant',style:'th',alignment:'right'},{text:'Pourquoi',style:'th'}]].concat(rows.map((r,i)=>[{text:String(i+1),style:'cellL',color:PDF.pine,bold:true},{text:r[0],style:'cellL'},{text:r[1],style:'cellR'},{text:r[2],style:'cellS'}]))},layout:LAYOUT_CLEAN,margin:[0,0,0,8]};
+}
+function roadmap(C){
+  const pr=C.priorities; const win=(a,b)=>pr.slice(a,b).map(p=>p.title);
+  const blocks=[
+    ['0 à 30 jours',[...win(0,3),'Confirmer le budget réel sur 30 jours de transactions',...(C.rqap?['Vérifier le dossier RQAP et la date du premier versement']:[])]],
+    ['30 à 60 jours',[...win(3,6),'Relever les droits REER, CELI et CELIAPP des deux parents (Mon dossier ARC, avis de cotisation)','Revoir les bénéficiaires d’assurances et le testament']],
+    ['60 à 90 jours',[...win(6,8),'Rendez-vous notaire (testaments, mandats, union parentale ou contrat) et conseiller (assurances, placements)',...(C.side?['Tester une première offre de revenu secondaire, autorisation en main']:[])]],
+    ['3 à 6 mois',['Automatiser toutes les cotisations le jour de paie',...(buys(S)?['Comparer location et achat avec des chiffres réels (préapprobation, taxes, frais de copropriété)']:[]),'Vérifier les allocations reçues contre les estimations']],
+    ['6 à 12 mois',['Suivre patrimoine net, taux d’épargne, dettes et revenus annexes chaque trimestre',`Réviser le plan au complet (${S.revue||'dans 12 mois'}) et refaire ce questionnaire`,...(num(S.salaireCibleA)>num(S.revenuA)?['Présenter le dossier de rémunération']:[])]]
+  ];
+  return {table:{widths:[86,'*'],body:blocks.map(b=>[{text:b[0],style:'cellL',bold:true,color:PDF.pine},{ul:b[1].map(t=>({text:t,style:'cellL'})),margin:[0,0,0,0]}])},layout:LAYOUT_CLEAN,margin:[0,0,0,8]};
+}
+function buildDoc(C){
+  const couple=C.couple, name=S.planName||'Plan de match financier', date=dateFR();
+  const A=S.prenomA||'Parent A', B=S.prenomB||'Parent B';
+  const hh=[S.statut,C.kids>0?`${C.kids} enfant${C.kids>1?'s':''}`:'sans enfant à charge',S.logement].filter(has).join(', ');
+  const content=[];
+  /* Couverture */
+  content.push({canvas:[{type:'rect',x:0,y:0,w:612,h:792,color:PDF.ink},{type:'rect',x:44,y:300,w:70,h:4,color:'#3FBCA8'}],absolutePosition:{x:0,y:0}});
+  content.push({text:'Jeune famille, Québec 2026',color:'#B9C4D9',fontSize:11,absolutePosition:{x:44,y:120}});
+  content.push({text:'Plan de match\nfinancier',color:'#FFFFFF',fontSize:40,bold:true,lineHeight:1.05,absolutePosition:{x:44,y:150}});
+  content.push({text:name,color:'#5CD6C2',fontSize:16,bold:true,absolutePosition:{x:44,y:325}});
+  content.push({text:[{text:'Préparé le ',color:'#B9C4D9'},{text:date,color:'#FFFFFF'}],fontSize:11,absolutePosition:{x:44,y:352}});
+  content.push({text:[{text:'Ménage : ',color:'#B9C4D9'},{text:hh,color:'#FFFFFF'}],fontSize:11,absolutePosition:{x:44,y:370}});
+  content.push({text:[{text:'Parents : ',color:'#B9C4D9'},{text:couple?`${A} et ${B}`:A,color:'#FFFFFF'}],fontSize:11,absolutePosition:{x:44,y:388}});
+  content.push({text:'Contenu',color:'#B9C4D9',fontSize:10,absolutePosition:{x:44,y:440}});
+  const toc=['Sommaire exécutif et priorités','Famille, revenus et congé parental','Budget mensuel','Actifs, passifs et dettes','Comptes enregistrés et fiscalité',...(C.home?['Projet immobilier']:[]),'Projections','Protection, succession et cadre juridique','Feuille de route de 12 mois','Hypothèses, paramètres 2026 et sources'];
+  content.push({ul:toc,color:'#FFFFFF',fontSize:10.5,lineHeight:1.35,absolutePosition:{x:44,y:456}});
+  content.push({text:'Confidentiel. Ce document contient des renseignements financiers personnels et a été produit localement par l’outil, sans transmission de données. Il fournit de l’information générale et des estimations fondées sur les paramètres 2026; il ne constitue pas un conseil financier, fiscal ou juridique. Faites-le réviser par un planificateur financier, un fiscaliste ou un notaire.',color:'#8E9BB5',fontSize:8.5,absolutePosition:{x:44,y:700},width:524});
+  /* Sommaire exécutif */
+  content.push({text:'',pageBreak:'after'});
+  content.push(H2('Sommaire exécutif'));
+  content.push({table:{widths:['*','*','*','*'],body:[[tile('Revenu net mensuel',fmtMoney(C.netMonthly),C.allocMonthly>0?`+ ${fmtMoney(C.allocMonthly)} d’allocations`:'avant allocations'),tile('Dépenses mensuelles',fmtMoney(C.expenses),`${fmtMoney(C.essentials)} essentielles`),tile('Capacité d’épargne',fmtMoney(C.capacity),`déclarée ${fmtMoney(C.savings)} (${fmtPct(C.savingsRate*100,0)})`),tile('Patrimoine net',fmtMoney(C.netWorth),`${fmtMoney(C.investable)} investissables`)]]},layout:LAYOUT_TILES,margin:[0,0,0,12]});
+  content.push({columns:[
+    {width:'46%',stack:[H3('Feux',[0,0,0,6]),{table:{widths:[14,'*',70],body:C.lights.map(l=>[lightDot(l.state),{text:l.label,style:'cellL'},{text:l.value,style:'cellR'}])},layout:LAYOUT_CLEAN}]},
+    {width:'*',stack:[H3('Lecture rapide',[0,0,0,6]),{ul:[
+      `Objectif principal : ${S.objectif||'à définir'}. Achat immobilier : ${S.horizonAchat||'non précisé'}.`,
+      `Fonds d’urgence : ${fmtNum(C.emergencyMonths,1)} mois sur ${C.emergencyTarget} visés (${fmtMoney(C.emergencyGap)} à combler).`,
+      C.rqap?`Congé parental : revenu net estimé à ${fmtMoney(C.leaveMonthlyIncome)} par mois, coussin requis ${fmtMoney(C.leaveTotalGap)}.`:'Aucun congé parental prévu dans les 12 mois.',
+      `Taux marginaux estimés : ${A} ${fmtPct(C.marginalA,1)}${couple?`, ${B} ${fmtPct(C.marginalB,1)}`:''}.`,
+      C.kids>0?`REEE : ${fmtMoney(C.reeeGrants)} de subventions par année sur la cotisation prévue${C.reeeGap>0?`, ${fmtMoney(C.reeeGap)} de cotisation manquante pour le maximum`:''}.`:'Aucun enfant à charge : pas de REEE ni d’allocations.',
+      `Plan annuel : ${fmtMoney(C.contribAnnual)} de cotisations et remboursements pour ${fmtMoney(C.capacity*12)} de capacité${C.planVsCapacity<0?` (dépassement de ${fmtMoney(-C.planVsCapacity)})`:''}.`
+    ].map(t=>({text:t,style:'body',margin:[0,0,0,3]}))}]}
+  ],columnGap:18,margin:[0,0,0,12]});
+  content.push(H3('Priorités classées selon vos réponses'));
+  if(C.priorities.length){ content.push({table:{widths:[22,'*'],body:C.priorities.slice(0,7).map(p=>[{text:String(p.rank).padStart(2,'0'),style:'cellL',color:PDF.pine,bold:true},{stack:[{text:p.title,style:'cellL',bold:true},{text:p.detail,style:'cellS'}]}])},layout:LAYOUT_CLEAN}); }
+  else content.push(para('Aucune priorité détectée : les indicateurs sont dans les cibles. Maintenez le rythme et révisez le plan à la date prévue.'));
+  /* Famille et congé */
+  content.push({text:'',pageBreak:'after'});
+  content.push(H2('Famille, revenus et congé parental'));
+  content.push({columns:[
+    {width:'*',stack:[H3('Le ménage',[0,0,0,6]),kvTable([['Situation conjugale',S.statut||'—'],['Logement',S.logement||'—'],[`${A}, âge`,fmtNum(num(S.ageA))],...(couple?[[`${B}, âge`,fmtNum(num(S.ageB))]]:[]),['Enfants de moins de 6 ans',fmtNum(C.k6)],['Enfants de 6 à 17 ans',fmtNum(C.k17)],['Objectif principal',S.objectif||'—'],['Achat immobilier',S.horizonAchat||'—']],['*',90])]},
+    {width:'*',stack:[H3('Revenus (estimation 2026)',[0,0,0,6]),kvTable([[`${A}, brut annuel`,fmtMoney(num(S.revenuA))],[`${A}, net estimé`,fmtMoney(C.inc.A.net)],[`${A}, taux marginal`,fmtPct(C.marginalA,1)],...(couple?[[`${B}, brut annuel`,fmtMoney(num(S.revenuB))],[`${B}, net estimé`,fmtMoney(C.inc.B.net)],[`${B}, taux marginal`,fmtPct(C.marginalB,1)]]:[]),['Revenu net mensuel du ménage',fmtMoney(C.netMonthly),true],['Allocations mensuelles estimées',fmtMoney(C.allocMonthly)]],['*',90])]}
+  ],columnGap:18});
+  content.push(smallNote(`Net estimé après impôt fédéral (abattement du Québec ${fmtPct(P.fedAbat,1)}), impôt du Québec, RRQ, assurance-emploi et RQAP 2026; retenues d’assurance collective, de régime de retraite et syndicales exclues.${has(S.revenuNetReel)&&num(S.revenuNetReel)>0?' Le revenu net mensuel réel inscrit remplace l’estimation.':''}`));
+  { const left=[], right=[];
+    if(C.rqap){ const r=C.rqap;
+      left.push(H3(`Congé parental : ${r.base?'régime de base (70 % puis 55 %)':'régime particulier (75 %)'}`,[0,0,0,6]));
+      left.push(kvTable([[`${A} : semaines (maternité ${r.mat}, parentales ${r.parA})`,String(r.semA)],...(couple?[[`${B} : semaines (paternité ${r.pat}, parentales ${r.parB})`,String(r.semB)]]:[]),['Semaines parentales partageables',String(r.parMax)+(r.bonusOk?' (bonus inclus)':'')],[`${A} : prestations brutes`,fmtMoney(r.grossA)],...(couple?[[`${B} : prestations brutes`,fmtMoney(r.grossB)]]:[]),...(r.topup>0?[['Complément de l’employeur',fmtMoney(r.topup)]]:[]),[`Revenu net du ménage pendant le congé de ${A}`,fmtMoney(r.monthlyDuringA)+' / mois',true],['Manque à gagner net du congé',fmtMoney(r.gapTotal)],['Coussin requis (dépenses moins revenu)',fmtMoney(C.leaveTotalGap),true]],['*',88]));
+      if(r.excess>0) left.push(callout(`Les semaines parentales demandées dépassent de ${r.excess} le maximum du régime. Validez avec le simulateur officiel du RQAP.`,'alert'));
+      left.push(smallNote(`Prestations imposables, calculées sur le revenu hebdomadaire moyen plafonné à ${fmtMoney(P.rqapMRA)} (2026); net estimé au taux effectif de l’année du congé. Les retenues du RQAP sont souvent insuffisantes : prévoir un solde d’impôt.`));
+    }
+    if(C.kids>0){
+      right.push(H3('Allocations familiales',[0,0,0,6]));
+      right.push(kvTable([['Revenu familial net rajusté estimé',fmtMoney(C.afniNow)],['Allocation canadienne pour enfants (annuel)',fmtMoney(C.aceNow)],['Allocation famille, Québec (annuel)',fmtMoney(C.afNow)],['Total mensuel estimé',fmtMoney(C.allocAnnualEst/12),true],...(C.rqap?[['Total mensuel sur le revenu de l’année du congé (versé juillet 2027 à juin 2028)',fmtMoney((C.aceLeave+C.afLeave)/12)]]:[])],['*',70]));
+      right.push(smallNote(`ACE calculée sur le revenu de l’année précédente, versée de juillet à juin; les cotisations REER et CELIAPP réduisent le revenu rajusté et augmentent les allocations. Allocation famille : minimum de ${fmtMoney(P.afMin)} par enfant quel que soit le revenu. À valider avec les calculateurs officiels.`));
+    }
+    if(left.length&&right.length) content.push({columns:[{width:'54%',stack:left},{width:'*',stack:right}],columnGap:18});
+    else if(left.length) content.push({stack:left}); else if(right.length) content.push({stack:right});
+  }
+  /* Budget */
+  content.push({text:'',pageBreak:'after'});
+  content.push(H2('Budget mensuel'));
+  const budgetRows=C.expenseRows.map(r=>[r.label,fmtMoney(r.v)]);
+  content.push({columns:[
+    {width:'55%',stack:[kvTable([...budgetRows,['Dépenses totales',fmtMoney(C.expenses),true],['dont dépenses essentielles',fmtMoney(C.essentials)],['Épargne mensuelle déclarée',fmtMoney(C.savings),true]],['*',80])]},
+    {width:'*',stack:[{svg:svgDonut(C.expenseRows.map(r=>({label:r.short,v:r.v})),{text:PDF.ink,sub:PDF.ink2}),width:230},kvTable([['Revenu disponible (net + allocations)',fmtMoney(C.income),true],['Capacité d’épargne',fmtMoney(C.capacity)],['Argent non attribué',fmtMoney(Math.max(0,C.unassigned))],['Taux d’épargne déclaré',fmtPct(C.savingsRate*100,0)],['Poids du logement (sur revenu net)',fmtPct(C.housingRatio*100,0)],['Poids des dettes (sur revenu net)',fmtPct(C.debtRatio*100,0)],['Fonds d’urgence',fmtNum(C.emergencyMonths,1)+' mois']],['*',70])]}
+  ],columnGap:16});
+  if(C.rqap&&C.expenses>0){ content.push(H3('Avant et pendant le congé parental')); content.push({table:{widths:['*',100,100],body:[[{text:'',style:'th'},{text:'Revenu habituel',style:'th',alignment:'right'},{text:`Pendant le congé de ${A}`,style:'th',alignment:'right'}],[{text:'Revenu net + allocations',style:'cellL'},{text:fmtMoney(C.income),style:'cellR'},{text:fmtMoney(C.leaveMonthlyIncome),style:'cellR'}],[{text:'Dépenses',style:'cellL'},{text:fmtMoney(C.expenses),style:'cellR'},{text:fmtMoney(C.expenses),style:'cellR'}],[{text:'Solde mensuel',style:'cellL',bold:true},{text:fmtMoney(C.capacity),style:'cellR',bold:true},{text:fmtMoney(C.leaveMonthlyIncome-C.expenses),style:'cellR',bold:true,color:C.leaveMonthlyIncome-C.expenses<0?PDF.rouge:PDF.ink}]]},layout:LAYOUT_CLEAN,margin:[0,0,0,8]}); content.push(callout(C.leaveTotalGap>0?`Sur ${fmtNum(C.rqap.monthsA,1)} mois de congé, l’écart cumulé atteint ${fmtMoney(C.leaveTotalGap)}. Liquidités actuelles : ${fmtMoney(num(S.comptes))}. ${num(S.comptes)>=C.leaveTotalGap?'Le coussin est couvert; les cotisations peuvent se poursuivre à rythme réduit.':'Constituer ce coussin avant le début du congé, ou réduire temporairement les cotisations non subventionnées (CELI, REER) tout en maintenant le REEE.'}`:`Le revenu pendant le congé couvre les dépenses déclarées. Les cotisations peuvent se poursuivre; maintenir le REEE en priorité.`,C.leaveTotalGap>0?'warn':'ok')); }
+  if(C.garderie) content.push(para(`Garderie : ${S.garderieType}. Coût brut estimé ${fmtMoney(C.garderie.brut)} par mois (21 jours), coût net environ ${fmtMoney(C.garderie.net)} après le crédit d’impôt du Québec (${fmtPct(P.creditGarde,0)} présumé) et la déduction fédérale du parent au revenu le plus bas. Contribution réduite 2026 : ${fmtMoney(P.garderieCPE,2)} par jour.`));
+  /* Bilan */
+  content.push({text:'',pageBreak:'after'});
+  content.push(H2('Actifs, passifs et dettes'));
+  const aRows=[['Liquidités (comptes chèques et épargne)',C.assets.liquid],['CELI',C.assets.celi],['CELIAPP',C.assets.celiapp],['REER',C.assets.reer],['REEE',C.assets.reee],['Placements non enregistrés',C.assets.placements],['Véhicules',C.assets.vehicule],['Autres actifs',C.assets.autres],...(C.assets.propriete>0?[['Propriété',C.assets.propriete]]:[])];
+  const lRows=[['Prêt auto',C.liab.auto],['Cartes de crédit',C.liab.cartes],['Marge ou prêt personnel',C.liab.marge],['Autres dettes',C.liab.autres],...(C.liab.hypotheque>0?[['Hypothèque',C.liab.hypotheque]]:[])];
+  content.push({columns:[
+    {width:'*',stack:[H3('Actifs',[0,0,0,6]),kvTable([...aRows.map(r=>[r[0],fmtMoney(r[1])]),['Total des actifs',fmtMoney(C.totalAssets),true]],['*',90])]},
+    {width:'*',stack:[H3('Passifs',[0,0,0,6]),kvTable([...lRows.map(r=>[r[0],fmtMoney(r[1])]),['Total des passifs',fmtMoney(C.totalLiab),true],['Patrimoine net',fmtMoney(C.netWorth),true],['Actifs investissables',fmtMoney(C.investable)]],['*',90])]}
+  ],columnGap:18});
+  const barItems=[...aRows.filter(r=>r[1]>0).map(r=>({label:r[0].split(' (')[0],v:r[1]})),...lRows.filter(r=>r[1]>0).map(r=>({label:r[0],v:-r[1]}))];
+  if(barItems.length) content.push({svg:svgBars(barItems,{text:PDF.ink,sub:PDF.ink2,w:480}),width:480,margin:[0,4,0,10]});
+  content.push(H3('Dettes : rembourser ou investir'));
+  const debtRows=[];
+  if(C.car) debtRows.push([`Prêt auto : ${fmtMoney(C.liab.auto)} à ${fmtPct(C.car.rate,2)} sur ${num(S.detteAutoMois)} mois`,`${fmtMoney(C.car.payment)} par mois, ${fmtMoney(C.car.interest)} d’intérêts restants. ${C.carVerdict==='rembourser'?'Taux supérieur au rendement central attendu : accélérer le remboursement.':(C.carVerdict==='investir'?'Taux inférieur au rendement attendu : conserver le rythme et investir le surplus dans les comptes enregistrés.':'Taux proche du rendement attendu : le remboursement reste un rendement garanti et sans risque.')}`]);
+  if(C.liab.cartes>0) debtRows.push([`Cartes de crédit : ${fmtMoney(C.liab.cartes)}`,`Environ ${fmtMoney(C.cardInterest)} d’intérêts par année à ${fmtPct(P.tauxCarte,2)}. À rembourser avant toute cotisation.`]);
+  if(C.liab.marge>0) debtRows.push([`Marge ou prêt personnel : ${fmtMoney(C.liab.marge)} à ${fmtPct(C.margeRate,2)}`,`Environ ${fmtMoney(C.margeInterest)} d’intérêts par année. Priorité après les cartes.`]);
+  if(C.liab.autres>0) debtRows.push([`Autres dettes : ${fmtMoney(C.liab.autres)}`,'Vérifier le taux; un prêt étudiant à faible taux avec crédit d’impôt sur les intérêts passe après les comptes enregistrés.']);
+  if(debtRows.length) content.push({table:{widths:['38%','*'],body:debtRows.map(r=>[{text:r[0],style:'cellL',bold:true},{text:r[1],style:'cellL'}])},layout:LAYOUT_CLEAN}); else content.push(para('Aucune dette à la consommation déclarée. La capacité d’épargne peut aller entièrement aux objectifs.'));
+  /* Comptes enregistrés */
+  content.push({text:'',pageBreak:'after'});
+  content.push(H2('Comptes enregistrés et fiscalité'));
+  content.push({columns:[
+    {width:'*',stack:[H3('Droits disponibles',[0,0,0,6]),{table:{widths:['*',75,...(couple?[75]:[])],body:[[{text:'',style:'th'},{text:A,style:'th',alignment:'right'},...(couple?[{text:B,style:'th',alignment:'right'}]:[])],[{text:'CELIAPP',style:'cellL'},{text:fmtMoney(num(S.droitsCeliappA)),style:'cellR'},...(couple?[{text:fmtMoney(num(S.droitsCeliappB)),style:'cellR'}]:[])],[{text:'REER',style:'cellL'},{text:fmtMoney(num(S.droitsReerA)),style:'cellR'},...(couple?[{text:fmtMoney(num(S.droitsReerB)),style:'cellR'}]:[])],[{text:'CELI',style:'cellL'},{text:fmtMoney(num(S.droitsCeliA)),style:'cellR'},...(couple?[{text:fmtMoney(num(S.droitsCeliB)),style:'cellR'}]:[])],[{text:'Taux marginal estimé',style:'cellL'},{text:fmtPct(C.marginalA,1),style:'cellR'},...(couple?[{text:fmtPct(C.marginalB,1),style:'cellR'}]:[])],[{text:'Statut CELIAPP',style:'cellL'},{text:S.celiappStatutA||'—',style:'cellR'},...(couple?[{text:S.celiappStatutB||'—',style:'cellR'}]:[])]]},layout:LAYOUT_CLEAN,margin:[0,0,0,8]}]},
+    {width:'*',stack:[H3('Valeur fiscale des cotisations prévues',[0,0,0,6]),kvTable([[`REER ${A} : ${fmtMoney(num(S.versReerA))} par année`,fmtMoney(C.reerValueA)+' d’impôt'],...(couple?[[`REER ${B} : ${fmtMoney(num(S.versReerB))} par année`,fmtMoney(C.reerValueB)+' d’impôt']]:[]),[`CELIAPP ${A} : ${fmtMoney(num(S.versCeliappA))}`,fmtMoney(C.celiappValueA)+' d’impôt'],...(couple?[[`CELIAPP ${B} : ${fmtMoney(num(S.versCeliappB))}`,fmtMoney(C.celiappValueB)+' d’impôt']]:[]),...(C.kids>0?[[`REEE : ${fmtMoney(num(S.versReee))} par année`,fmtMoney(C.reeeGrants)+' de subventions']]:[]),['Capacité CELIAPP restante estimée',fmtMoney(C.celiappCapA+C.celiappCapB)]],['*',95])]}
+  ],columnGap:18});
+  content.push(H3('Ordre de priorité des cotisations suggéré'));
+  content.push(waterfall(C));
+  const fiscalNotes=[
+    `Plafonds 2026 : CELI ${fmtMoney(P.celiPlafond)} (${fmtMoney(P.celiCumul)} cumulés depuis 2009), REER ${fmtMoney(P.reerPlafond)} ou ${fmtPct(P.reerTaux,0)} du revenu gagné de 2025 moins le facteur d’équivalence, CELIAPP ${fmtMoney(P.celiappAnnuel)} par année et ${fmtMoney(P.celiappVie)} à vie avec report limité à ${fmtMoney(P.celiappReport)}.`,
+    `CELIAPP : les droits commencent à l’ouverture; le compte doit être fermé 15 ans après l’ouverture ou à 71 ans; sans achat, le solde se transfère au REER sans affecter les droits REER. Le RAP (${fmtMoney(P.rapMax)} par personne, remboursable sur 15 ans) peut se combiner au CELIAPP pour le même achat.`,
+    couple&&C.spousalGap>=8?`REER de conjoint : le parent ${C.highEarner} cotise et déduit à son taux (${fmtPct(Math.max(C.marginalA,C.marginalB),1)}); le revenu sera imposé chez l’autre à la retraite. Règle des trois 31 décembre avant tout retrait.`:'REER ou CELI : à taux marginal élevé aujourd’hui et plus faible à la retraite, le REER gagne; à taux modéré ou avec un régime de retraite d’employeur généreux, le CELI offre plus de flexibilité.',
+    `REEE : SCEE ${fmtPct(P.sceeTaux,0)} (max. ${fmtMoney(P.sceeVie)} à vie) et IQEE ${fmtPct(P.iqeeTaux,0)} (max. ${fmtMoney(P.iqeeVie)} à vie) sur les premiers ${fmtMoney(P.reeeRepere)} par enfant par année; les droits de subvention inutilisés se rattrapent à raison d’une année à la fois (jusqu’à 5 000 $ de cotisation subventionnée par année). Plafond de cotisations : ${fmtMoney(P.reeeVie)} par enfant.`,
+    'Les cotisations REER et CELIAPP réduisent le revenu familial net rajusté : elles augmentent l’ACE et peuvent augmenter l’Allocation famille et le crédit pour frais de garde. Le taux marginal effectif d’un parent à revenu moyen dépasse donc souvent le taux d’impôt affiché.'
+  ];
+  content.push({ul:fiscalNotes.map(t=>({text:t,style:'small',margin:[0,0,0,3]})),margin:[0,4,0,0]});
+  /* Immobilier */
+  if(C.home){ const h=C.home;
+    content.push({text:'',pageBreak:'after'});
+    content.push(H2('Projet immobilier'));
+    const finRows=[['Prix cible',fmtMoney(h.price)],['Mise de fonds',`${fmtMoney(h.down)} (${fmtPct(h.downPct,1)})`],['Mise de fonds minimale',fmtMoney(h.minDown)],...(h.insured?[['Prime d’assurance prêt (ajoutée au prêt)',fmtMoney(h.premium)],['TVQ sur la prime (comptant)',fmtMoney(h.tvq)]]:[['Assurance prêt','non requise']]),['Prêt hypothécaire',fmtMoney(h.principal)],[`Paiement à ${fmtPct(h.rate,2)} sur ${h.years} ans`,fmtMoney(h.payment)+' / mois',true],['Taux de qualification (test de résistance)',fmtPct(h.qRate,2)],['Ratio ABD (max. '+P.gdsMax+' %)',fmtPct(h.gds,0)],['Ratio ATD (max. '+P.tdsMax+' %)',fmtPct(h.tds,0)],['Résultat',h.passes?'admissible':'non admissible',true],['Prix maximal estimé avec cette mise de fonds',fmtMoney(Math.floor(h.maxPrice/5000)*5000)]];
+    const costRows=[['Paiement hypothécaire',fmtMoney(h.payment)],['Taxes municipales et scolaires',fmtMoney(num(S.taxesAnnuelles)/12)],['Assurance habitation',fmtMoney(num(S.assuranceHab)/12)],['Copropriété',fmtMoney(num(S.fraisCondo))],[`Entretien (${fmtPct(num(S.entretienPct),1)} par année)`,fmtMoney(h.price*num(S.entretienPct)/100/12)],['Total propriétaire',fmtMoney(h.ownMonthly),true],['Loyer comparable',fmtMoney(h.rent)],['Écart mensuel',fmtMoney(h.diff)]];
+    const closeRows=[['Droits de mutation (2026)',fmtMoney(h.dm)],...(h.dmCredit>0?[['Crédit Québec premier acheteur sur droits de mutation (annoncé 2026, à valider)','-'+fmtMoney(h.dmCredit)]]:[]),['Notaire (estimé)',fmtMoney(P.notaire)],['Inspection (estimé)',fmtMoney(P.inspection)],['Déménagement et ajustements (estimé)',fmtMoney(P.demenagement)],...(h.insured?[['TVQ sur la prime d’assurance prêt',fmtMoney(h.tvq)]]:[]),...(h.firstBuyer?[['Crédits premier acheteur (fédéral et Québec, estimés)','-'+fmtMoney(P.cahpFed+P.cahpQc)]]:[]),['Frais de clôture nets',fmtMoney(h.closingNet),true],['Liquidités à prévoir (mise de fonds + frais bruts)',fmtMoney(h.down+h.closing),true]];
+    const rvb={table:{widths:['*',84],body:[[{text:`Acheter : valeur nette après ${h.N} ans (appréciation ${fmtPct(num(S.appreciation),1)}, frais de vente ${fmtPct(P.fraisVente,0)}, solde déduit)${h.diff<0?', plus la différence mensuelle investie':''}`,style:'cellL'},{text:fmtMoney(h.buyWealth),style:'cellR',bold:true}],[{text:`Louer : mise de fonds et frais investis à ${fmtPct(num(S.rendementAlt),1)}${h.diff>0?', plus la différence mensuelle investie':''}`,style:'cellL'},{text:fmtMoney(h.rentWealth),style:'cellR',bold:true}],[{text:'Écart en faveur de',style:'cellL',bold:true},{text:(h.buyWealth>=h.rentWealth?'l’achat : ':'la location : ')+fmtMoney(Math.abs(h.buyWealth-h.rentWealth)),style:'cellR',bold:true,color:PDF.pine}]]},layout:LAYOUT_CLEAN,margin:[0,0,0,8]};
+    content.push({columns:[
+      {width:'*',stack:[H3('Financement',[0,0,0,6]),kvTable(finRows,['*',92]),H3('Coût mensuel complet',[0,4,0,6]),kvTable(costRows,['*',80])]},
+      {width:'*',stack:[H3('Frais de clôture',[0,0,0,6]),kvTable(closeRows,['*',80]),H3(`Location ou achat sur ${h.N} ans`,[0,4,0,6]),rvb]}
+    ],columnGap:18});
+    content.push(callout(h.passes?`Le projet passe le test de résistance. ${h.diff>0?`La propriété coûte ${fmtMoney(h.diff)} de plus par mois que la location : cet écart doit tenir dans le budget sans sacrifier le REEE ni le fonds d’urgence.`:'Le coût mensuel complet est inférieur ou égal au loyer comparable.'} Résultat sensible à l’appréciation et au rendement alternatif : tester 1 % et 6 %.`:`Le projet ne passe pas le test de résistance. Options : viser environ ${fmtMoney(Math.floor(h.maxPrice/5000)*5000)}, augmenter la mise de fonds (CELIAPP des deux parents, RAP), réduire les dettes ou attendre la fin du congé parental.`,h.passes?'ok':'warn'));
+    content.push(smallNote(`Droits de mutation 2026 : ${fmtPct(P.dmR1,1)} jusqu’à ${fmtMoney(P.dmT1)}, ${fmtPct(P.dmR2,0)} jusqu’à ${fmtMoney(P.dmT2)}, ${fmtPct(P.dmR3,1)} au-delà, plus les tranches municipales (${S.ville||'municipalité'} : vérifier). Mise de fonds minimale : 5 % jusqu’à 500 000 $, 10 % sur l’excédent jusqu’à 1,5 M$, 20 % au-delà.`));
+  }
+  /* Projections */
+  content.push({text:'',pageBreak:'after'});
+  content.push(H2('Projections'));
+  const pr=C.proj;
+  content.push(para(`Point de départ : ${fmtMoney(C.investable)} d’actifs investissables (liquidités, CELI, CELIAPP, REER, non enregistré) et ${fmtMoney(C.contribAnnualInvest)} de cotisations annuelles selon le plan d’action (hors REEE et remboursements de dettes). Inflation présumée : ${fmtPct(pr.infl*100,1)}. Les montants sont en dollars d’aujourd’hui.`));
+  content.push({table:{widths:['*',...pr.rates.map(()=>100)],body:[[{text:'Horizon',style:'th'},...pr.rates.map((r,i)=>({text:`${['Prudent','Central','Optimiste'][i]} ${fmtPct(r,0)}`,style:'th',alignment:'right'}))],...pr.rows.map(row=>[{text:`${row.N} ans${row.N===pr.yearsToRet?` (retraite de ${A} à ${num(S.retraiteAge)||65} ans)`:''}`,style:'cellL'},...row.vals.map(v=>({text:fmtMoney(v.real),style:'cellR'}))])]},layout:LAYOUT_CLEAN,margin:[0,0,0,10]});
+  { const yrs=Math.max(...pr.horizons); const series=pr.rates.map((r,i)=>({label:`${['Prudent','Central','Optimiste'][i]} ${fmtPct(r,0)}`,color:['#5E6B82','#136F63','#B97E00'][i],points:Array.from({length:yrs+1},(_,n)=>fv(r/100,n,C.investable,C.contribAnnualInvest)/Math.pow(1+pr.infl,n))})); content.push({svg:svgLines(series,{text:PDF.ink,sub:PDF.ink2,grid:PDF.line,w:500}),width:500,margin:[0,0,0,10]}); }
+  if(C.reeeProj) content.push(para(`REEE : avec ${fmtMoney(num(S.versReee))} de cotisations et ${fmtMoney(C.reeeGrants)} de subventions par année au rendement central, le régime atteindrait environ ${fmtMoney(C.reeeProj.nominal)} (nominal) dans ${C.reeeProj.years} ans, lorsque le plus jeune enfant approchera des études postsecondaires.`));
+  content.push({ul:[
+    'Le REER et le CELIAPP sont des montants avant impôt : à la retraite, les retraits REER sont imposés; le CELI ne l’est pas. Un REER de 100 000 $ vaut moins qu’un CELI de 100 000 $.',
+    `Tolérance au risque déclarée : ${S.tolerance||'non précisée'}. L’argent nécessaire dans moins de 3 ans (mise de fonds, fonds d’urgence) reste en liquidités ou en CPG; l’horizon de 10 ans et plus se prête à une diversification mondiale à faibles frais, rééquilibrée périodiquement.`,
+    'Éviter de concentrer le portefeuille sur une prévision de crise, un secteur, un pays ou un titre. La discipline des cotisations automatiques compte davantage que le choix du moment.'
+  ].map(t=>({text:t,style:'small',margin:[0,0,0,3]}))});
+  /* Protection */
+  content.push({text:'',pageBreak:'after'});
+  content.push(H2('Protection, succession et cadre juridique'));
+  const protRows=[[`Testament à jour, ${A}`,S.testamentA],...(couple?[[`Testament à jour, ${B}`,S.testamentB]]:[]),[`Mandat de protection, ${A}`,S.mandatA],...(couple?[[`Mandat de protection, ${B}`,S.mandatB]]:[]),['Tuteur désigné pour les enfants',S.tuteur],['Bénéficiaires revus depuis la naissance',S.beneficiaires],[`Assurance invalidité, ${A}`,S.assInvA],...(couple?[[`Assurance invalidité, ${B}`,S.assInvB]]:[]),['Assurance maladies graves',S.assMaladieGrave],['Enfant ajouté aux assurances collectives et médicaments',S.assCollectiveEnfant],...(C.kids>0?[['Enfant inscrit au guichet des services de garde',S.garderieInscrit],['NAS obtenu pour chaque enfant',S.nasEnfant]]:[]),...(isFait(S)?[['Effets de l’union parentale compris',S.unionParentale],['Convention notariée d’union parentale',S.conventionUP]]:[])];
+  content.push({columns:[
+    {width:'*',stack:[H3('Liste de contrôle',[0,0,0,6]),{table:{widths:['*',110],body:protRows.map(r=>[{text:r[0],style:'cellL'},{text:r[1]||'—',style:'cellR',color:statusColor(r[1]),bold:true}])},layout:LAYOUT_CLEAN}]},
+    {width:'42%',stack:[H3('Assurance vie : besoin estimé',[0,0,0,6]),kvTable([[`${A} : besoin`,fmtMoney(C.lifeNeedA)],[`${A} : couverture en place`,fmtMoney(num(S.assVieA))],[`${A} : écart`,fmtMoney(C.lifeGapA),true],...(couple?[[`${B} : besoin`,fmtMoney(C.lifeNeedB)],[`${B} : couverture en place`,fmtMoney(num(S.assVieB))],[`${B} : écart`,fmtMoney(C.lifeGapB),true]]:[])],['*',80]),smallNote(`Règle simplifiée : ${P.multAssVie} fois le revenu brut plus les dettes, moins la moitié des actifs liquides. Une assurance temporaire 20 ou 25 ans couvre la période de dépendance des enfants au meilleur coût; la protection collective de l’employeur disparaît avec l’emploi.`)]}
+  ],columnGap:18});
+  content.push(H3('Ce que le Québec change pour une jeune famille'));
+  const legal=[
+    isFait(S)?`Union parentale : depuis le 30 juin 2025, les conjoints de fait qui ont un enfant ensemble y sont assujettis automatiquement. Un patrimoine d’union parentale (résidences familiales, meubles, véhicules) se partage à parts égales en cas de séparation; les REER, régimes de retraite, RRQ, héritages et dons en sont exclus. La résidence familiale est protégée (consentement requis pour vendre, louer ou hypothéquer) et une prestation compensatoire peut être demandée. Sans testament, le conjoint survivant hérite du tiers et les enfants des deux tiers. Le patrimoine peut être modifié ou écarté par acte notarié; renonciation possible dans les 90 jours de la naissance.`:(S.statut==='Mariés ou unis civilement'?'Mariage ou union civile : patrimoine familial (résidences, meubles, véhicules, REER et régimes de retraite accumulés pendant l’union) partagé en parts égales à la rupture, protection de la résidence familiale et droits successoraux du conjoint survivant. Le régime matrimonial (société d’acquêts par défaut, ou séparation de biens par contrat) règle le reste des biens.':'Parent seul : le testament, le mandat de protection et la désignation d’un tuteur sont encore plus déterminants, car aucun conjoint ne prend le relais automatiquement.'),
+    'Succession d’un enfant mineur : un enfant ne peut pas recevoir un héritage ou un capital d’assurance directement. Sans fiducie testamentaire, le parent survivant ou le tuteur administre sous la surveillance du Curateur public au-delà de 40 000 $. Le testament nomme le tuteur et peut créer une fiducie avec un fiduciaire distinct.',
+    'Désignations de bénéficiaires : au Québec, les REER et CELI détenus hors assurance ne permettent pas de désigner un bénéficiaire auprès de l’institution; la transmission passe par le testament. Les produits d’assurance (assurance vie, fonds distincts) permettent une désignation directe.',
+    'Documents à conserver ensemble : certificat de naissance, NAS de l’enfant, contrats d’assurance, testaments et mandats, relevés des comptes enregistrés, mots de passe gérés dans un gestionnaire sécurisé avec accès d’urgence.'
+  ];
+  content.push({ul:legal.map(t=>({text:t,style:'small',margin:[0,0,0,4]}))});
+  /* Feuille de route */
+  content.push({text:'',pageBreak:'after'});
+  content.push(H2('Feuille de route de 12 mois'));
+  content.push(roadmap(C));
+  const actions=[H3('Mes trois actions prioritaires',[0,0,0,6]),{table:{widths:[18,'*'],body:[[{text:'1',style:'cellL',color:PDF.pine,bold:true},{text:S.action1||'—',style:'cellL'}],[{text:'2',style:'cellL',color:PDF.pine,bold:true},{text:S.action2||'—',style:'cellL'}],[{text:'3',style:'cellL',color:PDF.pine,bold:true},{text:S.action3||'—',style:'cellL'}]]},layout:LAYOUT_CLEAN,margin:[0,0,0,10]}];
+  const notes=[];
+  if(has(S.questions)&&S.questions.trim()){ notes.push(H3('Questions pour mon conseiller ou pour Claude',[0,0,0,6])); notes.push(para(S.questions)); }
+  if(has(S.commentaires)&&S.commentaires.trim()){ notes.push(H3('Changements attendus dans les 12 mois',[0,0,0,6])); notes.push(para(S.commentaires)); }
+  if(notes.length) content.push({columns:[{width:'*',stack:actions},{width:'*',stack:notes}],columnGap:18}); else content.push({stack:actions});
+  content.push(H3('Cibles annuelles du plan'));
+  content.push(twoCol([[`Fonds d’urgence visé (${C.emergencyTarget} mois)`,fmtMoney(C.emergencyTargetAmt)],['Épargne automatique mensuelle, hors cotisations',fmtMoney(num(S.epargneAuto))],[`CELIAPP ${A}${couple?` / ${B}`:''}`,couple?`${fmtMoney(num(S.versCeliappA))} / ${fmtMoney(num(S.versCeliappB))}`:fmtMoney(num(S.versCeliappA))],[`REER ${A}${couple?` / ${B}`:''}`,couple?`${fmtMoney(num(S.versReerA))} / ${fmtMoney(num(S.versReerB))}`:fmtMoney(num(S.versReerA))],[`CELI ${A}${couple?` / ${B}`:''}`,couple?`${fmtMoney(num(S.versCeliA))} / ${fmtMoney(num(S.versCeliB))}`:fmtMoney(num(S.versCeliA))],...(C.kids>0?[['REEE (tous les enfants)',fmtMoney(num(S.versReee))]]:[]),['Remboursement de dettes additionnel (mensuel)',fmtMoney(num(S.remboursementSupp))],[`Salaire cible, ${A}`,fmtMoney(num(S.salaireCibleA))],...(couple?[[`Salaire cible, ${B}`,fmtMoney(num(S.salaireCibleB))]]:[]),...(C.side?[['Revenu secondaire brut visé',fmtMoney(C.side.gross)]]:[]),['Total annuel des cotisations et remboursements',fmtMoney(C.contribAnnual),true],['Capacité d’épargne annuelle selon le budget',fmtMoney(C.capacity*12),true]]));
+  /* Hypothèses */
+  content.push({text:'',pageBreak:'after'});
+  content.push(H2('Hypothèses, paramètres 2026 et sources'));
+  const paramRows=PARAM_GROUPS.flatMap(g=>g.fields.map(f=>[f[1],(f[3]==='$'?fmtMoney(P[f[0]],P[f[0]]%1?2:0):(f[3]==='%'?fmtPct(P[f[0]],P[f[0]]%1?2:0):fmtNum(P[f[0]])+(f[3]==='sem.'?' sem.':'')))]));
+  const third=Math.ceil(paramRows.length/3); const colOf=rows=>({width:'*',table:{widths:['*',48],body:rows.map(r=>[{text:r[0],style:'cellXS'},{text:r[1],style:'cellXSR'}])},layout:LAYOUT_XS});
+  content.push({columns:[colOf(paramRows.slice(0,third)),colOf(paramRows.slice(third,2*third)),colOf(paramRows.slice(2*third))],columnGap:12,margin:[0,0,0,10]});
+  content.push(H3('Points de contrôle'));
+  content.push({ul:[
+    'Valider les chiffres officiels à la date d’utilisation : les plafonds, seuils et taux changent chaque année (et le crédit sur les droits de mutation annoncé en 2026 reste à confirmer).',
+    'Le CELIAPP est soumis à un plafond annuel et à un report limité, pas seulement à un plafond à vie; les droits REER dépendent du revenu gagné et du facteur d’équivalence.',
+    'Les allocations varient selon le revenu familial net rajusté de l’année précédente; les estimations ici utilisent le revenu courant.',
+    'Les rendements, l’appréciation immobilière et les salaires cibles sont des hypothèses, jamais des garanties.',
+    'Les revenus secondaires doivent être déclarés; la réserve d’impôt à prévoir correspond au taux marginal du parent concerné.'
+  ].map(t=>({text:t,style:'small',margin:[0,0,0,3]})),margin:[0,0,0,10]});
+  content.push(H3('Sources officielles consultées'));
+  content.push({text:'canada.ca (ARC : plafonds CELI, REER, CELIAPP, ACE, tables de retenues T4032-QC 2026) · revenuquebec.ca (paliers 2026, crédits) · retraitequebec.gouv.qc.ca (Allocation famille 2026, RRQ) · rqap.gouv.qc.ca (prestations et revenu maximal assurable 2026) · quebec.ca (contribution réduite 2026, union parentale) · Loi concernant les droits sur les mutations immobilières (tranches 2026) · SCHL et BSIF (assurance prêt, test de résistance).',style:'small',margin:[0,0,0,10]});
+  content.push(H3('Mandat de révision pour Claude'));
+  content.push({text:mandateText(),style:'small',margin:[0,0,0,6]});
+  content.push({text:'Avertissement : document d’information et de planification personnelle produit par un outil automatisé. Il ne constitue pas un conseil financier, fiscal ou juridique personnalisé et ne remplace pas la consultation d’un planificateur financier, d’un fiscaliste, d’un courtier d’assurance ou d’un notaire.',style:'small',italics:true,margin:[0,8,0,0]});
+
+  const dd={
+    pageSize:'LETTER',pageMargins:[44,58,44,56],
+    info:{title:`${name} (${date})`,author:'Plan de match financier, Québec 2026',subject:'Plan financier familial',creator:'planfam2026'},
+    header:(cur)=> cur===1?null:{columns:[{text:name,style:'hdr'},{text:'Plan de match financier, Québec 2026',style:'hdr',alignment:'right'}],margin:[44,24,44,0]},
+    footer:(cur,total)=> cur===1?null:{columns:[{text:`Produit localement le ${date}. Information générale et estimations, pas un conseil financier.`,style:'ftr'},{text:`${cur} / ${total}`,style:'ftr',alignment:'right'}],margin:[44,18,44,0]},
+    content,
+    styles:{
+      h2:{fontSize:20,bold:true,color:PDF.ink},h3:{fontSize:12,bold:true,color:PDF.ink},body:{fontSize:9.5,color:PDF.ink,lineHeight:1.25},small:{fontSize:8.2,color:PDF.ink2,lineHeight:1.25},
+      th:{fontSize:8.5,bold:true,color:PDF.ink2},cellL:{fontSize:9,color:PDF.ink,lineHeight:1.2},cellR:{fontSize:9,color:PDF.ink,alignment:'right'},cellS:{fontSize:8,color:PDF.ink2,lineHeight:1.2},cellXS:{fontSize:7.6,color:PDF.ink2},cellXSR:{fontSize:7.6,color:PDF.ink,alignment:'right'},
+      tileL:{fontSize:8,color:PDF.ink2},tileV:{fontSize:15,bold:true,color:PDF.ink,margin:[0,2,0,1]},tileS:{fontSize:7.5,color:PDF.ink2},
+      hdr:{fontSize:8,color:PDF.ink3},ftr:{fontSize:7.5,color:PDF.ink3}
+    },
+    defaultStyle:{font:'Roboto',fontSize:9.5,color:PDF.ink}
+  };
+  return sanitizePdf(dd);
+}
+function pdfFileName(){ return `Plan-de-match-financier-${todayISO()}.pdf`; }
+function makePdf(mode){
+  const st=document.getElementById('pdfStatus');
+  if(typeof pdfMake==='undefined'){ if(st){ st.className='status err'; st.textContent='La bibliothèque PDF n’a pas pu être chargée (connexion requise au premier chargement). Rechargez la page et réessayez.'; } return; }
+  try{
+    if(st){ st.className='status'; st.textContent='Préparation du PDF…'; }
+    const dd=buildDoc(C); const pdf=pdfMake.createPdf(dd);
+    if(mode==='open'){ pdf.open(); if(st){ st.className='status ok'; st.textContent='PDF ouvert dans un nouvel onglet.'; } return; }
+    pdf.getBlob(blob=>{ const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=pdfFileName(); document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); },4000); if(st){ st.className='status ok'; st.textContent=`PDF téléchargé : ${pdfFileName()}`; } });
+  }catch(e){ console.error(e); if(st){ st.className='status err'; st.textContent='Erreur pendant la génération : '+(e.message||e); } }
+}
+</script>
+<script>
+/* ---------- Événements et initialisation ---------- */
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),2600); }
+function recompute(){ C=compute(); renderRail(); renderDash(); }
+function go(i){ current=clamp(i,0,SECTIONS.length-1); applySectionDefaults(SECTIONS[current]); C=compute(); renderSection(); renderRail(); renderDash(); window.scrollTo({top:0,behavior:'smooth'}); }
+function refreshFieldState(k){ const f=FIELD_BY_KEY[k]; const wrap=document.querySelector(`[data-field="${k}"]`); if(!f||!wrap) return; const req=fieldRequired(f), filled=fieldFilled(f); wrap.classList.toggle('missing',req&&!filled); wrap.classList.toggle('filled',req&&filled); }
+function visibilityChanged(){ /* un champ conditionnel peut apparaître ou disparaître : re-rendre l’étape en conservant le focus */ const active=document.activeElement; const k=active&&active.dataset?active.dataset.k:null; const pos=active&&active.selectionStart; renderSection(); if(k){ const el=document.getElementById('f_'+k); if(el){ el.focus({preventScroll:true}); try{ if(pos!==undefined&&pos!==null&&el.setSelectionRange) el.setSelectionRange(pos,pos);}catch(e){} } } }
+const CONDITIONAL_KEYS=new Set(['statut','logement','conge','horizonAchat','garderieType','revenuSecondaireType','enfantsMoins6','enfants6a17']);
+function onInput(e){
+  const el=e.target; const k=el.dataset&&el.dataset.k; if(!k) return;
+  const f=FIELD_BY_KEY[k]; if(!f) return;
+  if(f.t==='check') S[k]=el.checked; else if(['money','pct','int','num'].includes(f.t)){ let v=el.value.replace(/[^0-9.,-]/g,''); if(v!==el.value) el.value=v; S[k]=v===''?'':v; } else S[k]=el.value;
+  save(); refreshFieldState(k);
+  clearTimeout(onInput._t); onInput._t=setTimeout(()=>{ C=compute(); renderLive(); renderRail(); renderDash(); if(CONDITIONAL_KEYS.has(k)&&(e.type==='change'||f.t==='select')) visibilityChanged(); const head=document.querySelector('.panel-head .state'); if(head){ const st=sectionStats(SECTIONS[current]); head.className='state'+(st.pct===100?' done':(st.done>0?' partial':'')); head.textContent=st.pct===100?'Complète':(st.done>0?`${st.done} / ${st.req}`:`${st.req} questions`); } },120);
+}
+function onBlurNumeric(e){ const el=e.target; const k=el.dataset&&el.dataset.k; const f=k&&FIELD_BY_KEY[k]; if(!f||!['money','pct','int','num'].includes(f.t)) return; if(el.value===''){ return; } let v=num(el.value); if(f.t==='int') v=Math.round(v); if(f.min!==undefined) v=Math.max(f.min,v); if(f.max!==undefined) v=Math.min(f.max,v); const out=(f.t==='money'||f.t==='int')?String(Math.round(v)):String(Math.round(v*100)/100); if(String(S[k])!==out){ S[k]=out; save(); C=compute(); renderLive(); renderRail(); renderDash(); refreshFieldState(k); } el.value=f.t==='money'?fmtNum(num(out)):out; }
+function onFocusNumeric(e){ const el=e.target; const k=el.dataset&&el.dataset.k; const f=k&&FIELD_BY_KEY[k]; if(!f||f.t!=='money') return; el.value=has(S[k])?String(S[k]):''; }
+function zeroFill(legend){ const sec=SECTIONS[current]; const g=(sec.groups||[]).find(x=>x.legend===legend); if(!g) return; let n=0; g.fields.forEach(f=>{ if(fieldVisible(f)&&fieldRequired(f)&&['money','pct','int','num'].includes(f.t)&&!fieldFilled(f)&&!(f.min!==undefined&&f.min>0)){ S[f.k]='0'; n++; } }); if(n){ save(); C=compute(); renderSection(); renderRail(); renderDash(); toast(`${n} champ${n>1?'s':''} mis à 0`); } else toast('Aucun champ vide dans ce bloc'); }
+function gotoField(k,secIndex){ go(secIndex); setTimeout(()=>{ const el=document.getElementById('f_'+k); if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); el.focus({preventScroll:true}); } },250); }
+function nextMissing(){ const m=missingFields(); if(!m.length){ go(SECTIONS.length-1); return; } gotoField(m[0].f.k,m[0].sec); closeDrawer('dashDrawer'); }
+
+/* Paramètres */
+function renderParams(){
+  const body=$('#paramsBody');
+  body.innerHTML=PARAM_GROUPS.map(g=>`<div class="params-group"><h3>${esc(g.title)}</h3><div class="grid">${g.fields.map(f=>`<div class="field"><label for="p_${f[0]}">${esc(f[1])}</label><div class="control"><input id="p_${f[0]}" data-p="${f[0]}" type="text" inputmode="decimal" value="${P[f[0]]}"><span class="unit">${esc(f[3])}</span></div></div>`).join('')}</div><div class="params-src">Source : ${esc(g.src)}</div></div>`).join('');
+}
+function onParamInput(e){ const el=e.target; const k=el.dataset&&el.dataset.p; if(!k) return; const v=num(el.value); P[k]=v; save(); clearTimeout(onParamInput._t); onParamInput._t=setTimeout(()=>{ C=compute(); renderLive(); renderDash(); },150); }
+function resetParams(){ Object.keys(P_DEFAULT).forEach(k=>P[k]=P_DEFAULT[k]); save(); renderParams(); C=compute(); renderLive(); renderDash(); toast('Paramètres 2026 réinitialisés'); }
+
+/* Thème */
+function applyTheme(t){ document.documentElement.setAttribute('data-theme',t); try{ localStorage.setItem(THEME_KEY,t);}catch(e){} const meta=document.querySelector('meta[name="theme-color"]'); if(meta) meta.setAttribute('content',t==='dark'?'#0A1020':'#13213A'); }
+function initTheme(){ let t=null; try{ t=localStorage.getItem(THEME_KEY);}catch(e){} if(!t) t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'; applyTheme(t); }
+
+/* Tiroirs */
+function openDrawer(id){ const d=document.getElementById(id); d.classList.add('open'); document.body.style.overflow='hidden'; if(id==='dashDrawer') renderDash(); }
+function closeDrawer(id){ const d=document.getElementById(id); if(d) d.classList.remove('open'); document.body.style.overflow=''; }
+
+/* Export / import / effacement */
+function exportJSON(){ const data={app:'planfam2026',version:1,exported:new Date().toISOString(),answers:S,params:P}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`plan-financier-reponses-${todayISO()}.json`; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},3000); toast('Réponses exportées'); }
+function importJSON(file){ const r=new FileReader(); r.onload=()=>{ try{ const d=JSON.parse(r.result); const answers=d.answers||d; if(typeof answers!=='object') throw new Error('format'); S={}; Object.keys(answers).forEach(k=>{ if(FIELD_BY_KEY[k]) S[k]=answers[k]; }); if(d.params&&typeof d.params==='object') Object.keys(d.params).forEach(k=>{ if(k in P) P[k]=d.params[k]; }); applyDefaults(); save(); C=compute(); renderParams(); go(current); renderDash(); toast('Réponses importées'); }catch(e){ toast('Fichier non reconnu'); } }; r.readAsText(file); }
+function resetAll(){ if(!confirm('Effacer toutes vos réponses enregistrées sur cet appareil ? Cette action est irréversible.')) return; S={}; applyDefaults(); try{ localStorage.removeItem(STORE_KEY);}catch(e){} save(); C=compute(); go(0); renderDash(); toast('Données effacées'); }
+function copyMandate(){ const payload=mandateText()+'\n\nDonnées du ménage (JSON) :\n'+JSON.stringify({...S,planName:undefined,prenomA:undefined,prenomB:undefined},null,2); const done=()=>toast('Mandat et données copiés'); if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(payload).then(done).catch(()=>fallbackCopy(payload,done)); } else fallbackCopy(payload,done); }
+function fallbackCopy(text,done){ const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(e){ toast('Copie impossible : sélectionnez le texte manuellement'); } ta.remove(); }
+
+/* Délégation d’événements */
+document.addEventListener('click',e=>{
+  const go_=e.target.closest('[data-go]'); if(go_){ go(parseInt(go_.dataset.go,10)); closeDrawer('dashDrawer'); return; }
+  const z=e.target.closest('[data-zero]'); if(z){ zeroFill(z.dataset.zero); return; }
+  const gf=e.target.closest('[data-goto-field]'); if(gf){ gotoField(gf.dataset.gotoField,parseInt(gf.dataset.sec,10)); return; }
+  if(e.target.closest('[data-next-missing]')){ nextMissing(); return; }
+  const cl=e.target.closest('[data-close]'); if(cl){ closeDrawer(cl.dataset.close); return; }
+  const id=e.target.closest('button')&&e.target.closest('button').id;
+  if(id==='btnParams'){ renderParams(); openDrawer('paramsDrawer'); }
+  else if(id==='btnDash'){ openDrawer('dashDrawer'); }
+  else if(id==='btnTheme'){ applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'); renderLive(); renderDash(); }
+  else if(id==='btnParamsReset'){ resetParams(); }
+  else if(id==='btnPdf'){ makePdf('download'); }
+  else if(id==='btnPdfOpen'){ makePdf('open'); }
+  else if(id==='btnExport'){ exportJSON(); }
+  else if(id==='btnImport'){ $('#fileImport').click(); }
+  else if(id==='btnReset'){ resetAll(); }
+  else if(id==='btnMandate'){ copyMandate(); }
+});
+document.addEventListener('input',e=>{ if(e.target.dataset&&e.target.dataset.p) onParamInput(e); else onInput(e); });
+document.addEventListener('change',e=>{ if(e.target.id==='fileImport'&&e.target.files[0]){ importJSON(e.target.files[0]); e.target.value=''; return; } if(e.target.dataset&&e.target.dataset.k){ onInput(e); } });
+document.addEventListener('focusout',onBlurNumeric);
+document.addEventListener('focusin',onFocusNumeric);
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeDrawer('dashDrawer'); closeDrawer('paramsDrawer'); } });
+
+initTheme(); load(); C=compute(); renderSection(); renderRail(); renderDash();
+</script>
+</body>
+</html>
