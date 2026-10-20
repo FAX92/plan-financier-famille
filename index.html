@@ -6,6 +6,8 @@
 <title>Plan de match financier | Jeune famille Québec 2026</title>
 <meta name="description" content="Outil interactif et gratuit pour bâtir le plan de match financier d’une jeune famille au Québec : budget, congé parental, comptes enregistrés, dettes, achat immobilier, projections et PDF personnalisé. Vos données restent sur votre appareil.">
 <meta name="theme-color" content="#13213A">
+<meta name="app-version" content="3.1">
+<!-- Plan de match financier, version 3.1 (bilingue FR/EN, objectifs et faisabilité, copilote Nickel) -->
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -389,6 +391,7 @@ pre.mandate{white-space:pre-wrap;font-family:var(--sans);font-size:13.5px;backgr
 'use strict';
 
 /* ---------- Langue ---------- */
+const APP_VERSION='3.1';
 const LANG_KEY='planfam2026.lang';
 let LANG='fr';
 const L=(fr,en)=>LANG==='en'?en:fr;
@@ -789,7 +792,7 @@ function footHTML(){
 }
 function welcomeHTML(){
   const g=globalStats(); const touched=userTouched();
-  return `<div class="step-kicker">${L('Octobre 2026 · Québec','October 2026 · Québec')}</div>
+  return `<div class="step-kicker">${L('Octobre 2026 · Québec','October 2026 · Québec')} · v${APP_VERSION}</div>
   <h1>${L(`Le plan de match financier d’une jeune famille, en ${SECTIONS.length-1} étapes`,`A young family’s financial game plan, in ${SECTIONS.length-1} steps`)}</h1>
   <p class="intro" style="max-width:66ch">${L('Un outil gratuit pour organiser le budget, traverser le congé parental sans surprise, utiliser les bons comptes dans le bon ordre, protéger la famille et décider d’un achat immobilier avec des chiffres complets. À la fin, un PDF clair résume votre plan.','A free tool to organize the budget, get through parental leave without surprises, use the right accounts in the right order, protect the family and decide on a home purchase with complete numbers. At the end, a clear PDF sums up your plan.')}</p>
   <div class="note"><p><b>${L('Confidentialité.','Privacy.')}</b> ${L('Tout se passe dans votre navigateur : les réponses sont enregistrées sur cet appareil seulement et le PDF est produit localement. Aucune donnée n’est transmise ni collectée. Avant de partager le PDF, rappelez-vous qu’il contient vos renseignements financiers.','Everything happens in your browser: answers are saved on this device only and the PDF is produced locally. No data is transmitted or collected. Before sharing the PDF, remember it contains your financial information.')}</p></div>
@@ -1240,7 +1243,7 @@ function generateHTML(){
   const ring=`<div class="gen-ring"><svg viewBox="0 0 132 132"><circle class="track" cx="66" cy="66" r="56"></circle><circle class="bar" cx="66" cy="66" r="56" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${(circ*(1-g.pct/100)).toFixed(1)}"></circle></svg><div class="val">${fmtPct(g.pct,0)}</div></div>`;
   const ready=g.pct===100;
   const missHtml = ready?'' : `<ul class="missing-list">${miss.slice(0,8).map(m=>`<li><button type="button" data-goto-field="${m.f.k}" data-sec="${m.sec}"><span>${esc(lb(m.f.l))}</span><span class="muted">${esc(lb(SECTIONS[m.sec].short))}</span></button></li>`).join('')}</ul>${miss.length>8?`<p class="missing-more">${L(`et ${miss.length-8} autre${miss.length-8>1?'s':''}…`,`and ${miss.length-8} more…`)}</p>`:''}`;
-  return `<div class="step-kicker">${stepKicker()}</div><h2>${L('Générer le plan','Generate the plan')}</h2>
+  return `<div class="step-kicker">${stepKicker()} · v${APP_VERSION}</div><h2>${L('Générer le plan','Generate the plan')}</h2>
   <div class="gen-hero" style="margin-top:14px">${ring}<div class="gen-text"><h2 style="font-size:19px">${ready?L('Toutes les questions requises sont répondues.','Every required question is answered.'):L(`${g.done} réponses sur ${g.req}.`,`${g.done} answers out of ${g.req}.`)}</h2><p class="muted">${ready?L('Le PDF reprend vos réponses, les indicateurs, les priorités, les projections et une feuille de route de 12 mois. Il est produit sur cet appareil.','The PDF brings together your answers, indicators, priorities, projections and a 12-month roadmap. It is produced on this device.'):L('Le PDF se débloque quand toutes les questions requises sont répondues. Un 0 est une réponse valide; les champs facultatifs peuvent rester vides.','The PDF unlocks once every required question is answered. 0 is a valid answer; optional fields can stay empty.')}</p>${missHtml}</div></div>
   <div class="gen-actions">
     <button class="btn primary" type="button" id="btnPdf" ${ready?'':'disabled'}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>${L('Télécharger le PDF','Download the PDF')}</button>
@@ -1652,7 +1655,7 @@ function buildDoc(C){
     pageSize:'LETTER',pageMargins:[44,58,44,56],
     info:{title:`${name} (${date})`,author:L('Plan de match financier, Québec 2026','Family financial game plan, Québec 2026'),subject:L('Plan financier familial','Family financial plan'),creator:'planfam2026'},
     header:(cur)=> cur===1?null:{columns:[{text:name,style:'hdr'},{text:L('Plan de match financier, Québec 2026','Family financial game plan, Québec 2026'),style:'hdr',alignment:'right'}],margin:[44,24,44,0]},
-    footer:(cur,total)=> cur===1?null:{columns:[{text:L(`Produit localement le ${date}. Information générale et estimations, pas un conseil financier.`,`Produced locally on ${date}. General information and estimates, not financial advice.`),style:'ftr'},{text:`${cur} / ${total}`,style:'ftr',alignment:'right'}],margin:[44,18,44,0]},
+    footer:(cur,total)=> cur===1?null:{columns:[{text:L(`Produit localement le ${date} (outil v${APP_VERSION}). Information générale et estimations, pas un conseil financier.`,`Produced locally on ${date} (tool v${APP_VERSION}). General information and estimates, not financial advice.`),style:'ftr'},{text:`${cur} / ${total}`,style:'ftr',alignment:'right'}],margin:[44,18,44,0]},
     content,
     styles:{
       h2:{fontSize:20,bold:true,color:PDF.ink},h3:{fontSize:12,bold:true,color:PDF.ink},body:{fontSize:9.5,color:PDF.ink,lineHeight:1.25},small:{fontSize:8.2,color:PDF.ink2,lineHeight:1.25},
@@ -1691,6 +1694,7 @@ function applyStaticTexts(){
   set('#btnDash .lbl',L('Tableau de bord','Dashboard'));
   set('#btnLang .lbl',LANG==='en'?'FR':'EN');
   const bl=document.getElementById('btnLang'); if(bl) bl.setAttribute('aria-label',LANG==='en'?'Passer au français':'Switch to English');
+  const rf=document.getElementById('railFoot'); if(rf) rf.setAttribute('title','v'+APP_VERSION);
   set('#railFoot',L('Vos réponses sont enregistrées automatiquement sur cet appareil seulement. Rien n’est envoyé sur un serveur.','Your answers are saved automatically on this device only. Nothing is sent to a server.'));
   set('#dashDrawerTitle',L('Tableau de bord','Dashboard'));
   set('#paramsDrawerTitle',L('Paramètres 2026','2026 settings'));
