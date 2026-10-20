@@ -1,14 +1,11 @@
 # Plan de match financier, jeune famille Québec 2026
 
-*Family financial game plan, young family Québec 2026. Bilingual tool: a FR/EN button in the header switches the whole interface, the dashboard, number formats and the PDF, without losing the answers already entered.*
-
 Outil web interactif et gratuit pour bâtir le plan de match financier d’une jeune famille au Québec : budget réel, congé parental (RQAP), allocations, comptes enregistrés (CELI, REER, CELIAPP, REEE), dettes, protection et succession, projet immobilier, projections et plan d’action. Quand toutes les questions requises sont répondues, l’outil produit un PDF complet, directement dans le navigateur.
 
 Site : `https://<votre-compte>.github.io/<nom-du-depot>/`
 
 ## Ce que fait l’outil
 
-- Interface bilingue : bouton FR/EN dans l’en-tête, qui change le questionnaire, le tableau de bord, les formats de nombres et le PDF, sans perdre les réponses.
 - Dix étapes guidées, sauvegardées automatiquement sur l’appareil (aucun serveur, aucune collecte).
 - Estimations en direct : revenu net 2026 (impôt fédéral et québécois, RRQ, assurance-emploi, RQAP), prestations RQAP selon le régime choisi, Allocation canadienne pour enfants et Allocation famille, patrimoine net, test de résistance hypothécaire, droits de mutation, comparaison location et achat, projections à trois scénarios.
 - Tableau de bord : indicateurs, feux (fonds d’urgence, taux d’épargne, logement, dettes, coussin du congé, REEE, protection juridique, test de résistance) et priorités classées selon les réponses.
