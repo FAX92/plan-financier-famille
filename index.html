@@ -254,6 +254,21 @@ pre.mandate{white-space:pre-wrap;font-family:var(--sans);font-size:13.5px;backgr
 
 @media (max-width:1180px){.dash{display:none}}
 @media (max-width:760px){.brand{flex:1;min-width:0}.brand-text strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}.topbar-spacer{display:none}.ring{width:34px;height:34px}.ring-label{display:none}.topbar-in{gap:8px;padding:8px 12px;min-height:56px}}
+/* Assistant IA */
+.ai-key{gap:8px}.ai-key input{padding-right:12px!important;font-family:var(--mono);text-align:left!important}
+.ai-eye{border:1.5px solid var(--line-2);background:var(--card);border-radius:10px;padding:0 12px;font-weight:700;font-size:13px;color:var(--ink-2);min-height:44px;flex:none}
+.ai-note{margin-top:14px;padding:14px 16px;border-radius:14px;border:1.5px solid var(--pine);background:var(--pine-soft)}
+.ai-note-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;margin-bottom:6px}
+.ai-note ul{margin:0 0 12px;padding-left:18px;font-size:14px;line-height:1.45}
+.ai-note li{margin-bottom:4px}
+.ai-wait{font-size:14px;color:var(--pine-ink)}
+.ai-card{margin-top:22px;padding:16px 18px;border-radius:16px;border:1.5px solid var(--pine);background:var(--card)}
+.ai-card h3{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;margin-bottom:8px}
+.ai-resume{font-size:14.5px;line-height:1.5;margin:8px 0 12px}
+.ai-list{margin:0 0 12px;padding-left:20px;font-size:14px;line-height:1.45}
+.ai-list li{margin-bottom:8px}
+.ag-dots{display:inline-flex;gap:4px;align-items:center;height:16px}.ag-dots i{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:dots 1.2s infinite}.ag-dots i:nth-child(2){animation-delay:.2s}.ag-dots i:nth-child(3){animation-delay:.4s}
+@keyframes dots{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
 /* Nickel */
 .agent-fab{position:fixed;right:18px;bottom:calc(18px + var(--safe-b));width:58px;height:58px;border-radius:50%;background:var(--ink);border:2px solid #3FBCA8;box-shadow:0 8px 24px -8px rgba(0,0,0,.45);display:grid;place-items:center;z-index:45;padding:0;transition:transform .15s}
 .agent-fab:hover{transform:translateY(-2px)}
@@ -391,7 +406,7 @@ pre.mandate{white-space:pre-wrap;font-family:var(--sans);font-size:13.5px;backgr
 'use strict';
 
 /* ---------- Langue ---------- */
-const APP_VERSION='3.1';
+const APP_VERSION='4.0';
 const LANG_KEY='planfam2026.lang';
 let LANG='fr';
 const L=(fr,en)=>LANG==='en'?en:fr;
@@ -489,6 +504,7 @@ function goalFields(i){ const show=S=>num(S.nbObjectifs)>=i; return [
 ]; }
 const SECTIONS = [
   { id:'depart', title:['Point de départ','Starting point'], short:['Départ','Start'], custom:'welcome' },
+  { id:'ia', title:['Assistant IA (facultatif)','AI assistant (optional)'], short:['IA','AI'], custom:'ai' },
   { id:'famille', title:['Fiche familiale et revenus','Family profile and income'], short:['Famille','Family'],
     intro:['Le portrait de base : qui compose le ménage, les revenus d’emploi et le congé parental. Ces réponses alimentent toutes les estimations suivantes.','The basics: who makes up the household, employment income and parental leave. These answers feed every estimate that follows.'],
     groups:[
@@ -770,9 +786,10 @@ function renderSection(){
   const sec=SECTIONS[current]; const el=panel();
   if(sec.custom==='welcome'){ el.innerHTML=welcomeHTML(); return; }
   if(sec.custom==='generate'){ el.innerHTML=generateHTML(); return; }
+  if(sec.custom==='ai'){ el.innerHTML=aiStepHTML(); return; }
   if(!visibleSection(sec)){
     const pending=sec.pendingIf&&sec.pendingIf(S);
-    el.innerHTML=`<div class="step-kicker">${stepKicker()}</div><h2>${esc(lb(sec.title))}</h2><p class="intro">${pending?L('Cette étape s’active selon votre réponse à la question « Achat immobilier envisagé » de l’étape Famille. Répondez-y d’abord : si un achat est envisagé, les questions du projet apparaîtront ici.','This step activates according to your answer to “Home purchase being considered” in the Family step. Answer it first: if a purchase is being considered, the project questions will appear here.'):L('Cette étape ne s’applique pas : aucun achat immobilier n’est prévu. Vous pouvez la réactiver en changeant la réponse « Achat immobilier envisagé » à l’étape Famille.','This step does not apply: no home purchase is planned. You can reactivate it by changing the answer to “Home purchase being considered” in the Family step.')}</p>${pending?`<button class="btn" type="button" data-goto-field="horizonAchat" data-sec="1">${L('Répondre à la question','Answer the question')}</button>`:''}${footHTML()}`;
+    el.innerHTML=`<div class="step-kicker">${stepKicker()}</div><h2>${esc(lb(sec.title))}</h2><p class="intro">${pending?L('Cette étape s’active selon votre réponse à la question « Achat immobilier envisagé » de l’étape Famille. Répondez-y d’abord : si un achat est envisagé, les questions du projet apparaîtront ici.','This step activates according to your answer to “Home purchase being considered” in the Family step. Answer it first: if a purchase is being considered, the project questions will appear here.'):L('Cette étape ne s’applique pas : aucun achat immobilier n’est prévu. Vous pouvez la réactiver en changeant la réponse « Achat immobilier envisagé » à l’étape Famille.','This step does not apply: no home purchase is planned. You can reactivate it by changing the answer to “Home purchase being considered” in the Family step.')}</p>${pending?`<button class="btn" type="button" data-goto-field="horizonAchat" data-sec="${SECTIONS.findIndex(x=>x.id==='famille')}">${L('Répondre à la question','Answer the question')}</button>`:''}${footHTML()}`;
     return;
   }
   const st=sectionStats(sec);
@@ -800,12 +817,13 @@ function welcomeHTML(){
     <div><b>${L('Chiffres 2026 vérifiés','Verified 2026 figures')}</b><p>${L('Plafonds CELI, REER et CELIAPP, RQAP, allocations, paliers d’impôt, droits de mutation. Modifiables dans « Paramètres 2026 ».','TFSA, RRSP and FHSA limits, QPIP, child benefits, tax brackets, transfer duties. Editable under “2026 settings”.')}</p></div>
     <div><b>${L('Estimations en direct','Live estimates')}</b><p>${L('Revenu net, prestations RQAP, allocations, patrimoine net, test de résistance hypothécaire et projections se calculent pendant que vous répondez.','Take-home pay, QPIP benefits, child benefits, net worth, mortgage stress test and projections update as you answer.')}</p></div>
     <div><b>${L('Priorités automatiques','Automatic priorities')}</b><p>${L('Le tableau de bord classe vos prochaines actions selon vos réponses : fonds d’urgence, REEE, CELIAPP, testament, dettes.','The dashboard ranks your next actions from your answers: emergency fund, RESP, FHSA, will, debts.')}</p></div>
+    <div><b>${L('Assistant IA, si vous le voulez','AI assistant, if you want it')}</b><p>${L('Avec votre propre clé API Claude ou OpenAI (étape 1, facultative), Nickel répond librement, chaque étape reçoit des observations et le PDF gagne une analyse approfondie. La clé reste sur votre appareil.','With your own Claude or OpenAI API key (step 1, optional), Nickel answers freely, each step gets observations and the PDF gains an in-depth analysis. The key stays on your device.')}</p></div>
     <div><b>${L('Nickel, le copilote','Nickel, the co-pilot')}</b><p>${L('Un castor qui suit votre progression, explique chaque étape, répond aux questions fréquentes avec les liens officiels et lit vos propres chiffres. Bouton en bas à droite.','A beaver that tracks your progress, explains each step, answers common questions with official links and reads your own figures. Button at the bottom right.')}</p></div>
     <div><b>${L('PDF complet','Complete PDF')}</b><p>${L('Disponible quand toutes les questions requises sont répondues. Enregistrez-le, imprimez-le ou soumettez-le à un conseiller.','Available once every required question is answered. Save it, print it or bring it to an advisor.')}</p></div>
   </div>
   <h3 style="margin-top:22px">${L('Mode d’emploi','How it works')}</h3>
   <ol class="steps-list">
-    <li><span class="dot"><span>1</span></span><span><b>${L(`Répondre aux ${SECTIONS.length-2} étapes`,`Answer the ${SECTIONS.length-2} steps`)}</b> <span class="s">${L('avec vos chiffres réels (avis de cotisation, talons de paie, relevés). Les champs marqués d’un point sont requis; un 0 est une réponse valide.','with your real figures (notice of assessment, pay stubs, statements). Fields marked with a dot are required; 0 is a valid answer.')}</span></span></li>
+    <li><span class="dot"><span>1</span></span><span><b>${L(`Répondre aux ${SECTIONS.length-3} étapes`,`Answer the ${SECTIONS.length-3} steps`)}</b> <span class="s">${L('avec vos chiffres réels (avis de cotisation, talons de paie, relevés). Les champs marqués d’un point sont requis; un 0 est une réponse valide.','with your real figures (notice of assessment, pay stubs, statements). Fields marked with a dot are required; 0 is a valid answer.')}</span></span></li>
     <li><span class="dot"><span>2</span></span><span><b>${L('Lire le tableau de bord','Read the dashboard')}</b> <span class="s">${L('au fil des réponses : indicateurs, feux et priorités s’ajustent.','as you go: indicators, status lights and priorities adjust.')}</span></span></li>
     <li><span class="dot"><span>3</span></span><span><b>${L('Générer le PDF','Generate the PDF')}</b> <span class="s">${L(`à l’étape ${SECTIONS.length-1}, puis le faire réviser (conseiller, planificateur financier, notaire ou Claude avec le mandat fourni).`,`at step ${SECTIONS.length-1}, then have it reviewed (advisor, financial planner, notary or Claude with the mandate provided).`)}</span></span></li>
   </ol>
@@ -1218,7 +1236,7 @@ const LIVE={
     return html;
   }
 };
-function renderLive(){ const sec=SECTIONS[current]; const el=document.getElementById('live'); if(!el) return; const fn=LIVE[sec.id]; if(!fn){ el.innerHTML=''; return; } el.className='live'; el.innerHTML=fn(C); }
+function renderLive(){ const sec=SECTIONS[current]; const el=document.getElementById('live'); if(!el) return; const fn=LIVE[sec.id]; const note=aiNoteHTML(sec.id); if(!fn){ el.className=note?'live':''; el.innerHTML=note; return; } el.className='live'; el.innerHTML=fn(C)+note; }
 
 /* ---------- Tableau de bord ---------- */
 function dashHTML(C){
@@ -1251,6 +1269,7 @@ function generateHTML(){
   </div>
   <div class="status" id="pdfStatus"></div>
   <p class="small muted">${L('Sur iPhone ou iPad : « Ouvrir dans un onglet », puis Partager et Enregistrer dans Fichiers. Le PDF contient vos renseignements financiers; retirez-les avant de le transmettre à un service externe.','On iPhone or iPad: “Open in a tab”, then Share and Save to Files. The PDF contains your financial information; remove it before sending it to an outside service.')}</p>
+  ${aiAnalysisHTML()}
   <h3 style="margin-top:22px">${L('Faire réviser le plan par Claude','Have Claude review the plan')}</h3>
   <p class="small muted">${L('Le mandat ci-dessous demande une analyse critique à partir de vos réponses (sans votre nom). Copiez-le dans Claude avec le PDF joint, ou tel quel.','The mandate below asks for a critical analysis based on your answers (without your name). Paste it into Claude with the PDF attached, or as is.')}</p>
   <pre class="mandate" id="mandateText">${esc(mandateText())}</pre>
@@ -1283,7 +1302,7 @@ Assume no contribution room, no eligibility and no guaranteed return. Flag any i
 <script>
 /* ---------- Nickel, le castor copilote ---------- */
 function beaverSVG(size){ return `<svg class="beaver" viewBox="0 0 64 64" width="${size}" height="${size}" aria-hidden="true"><ellipse cx="47" cy="47" rx="13" ry="7" fill="#4E2F16"/><path d="M38 44c4 1 12 1 18 4-6 2-14 3-18 2z" fill="#3B2210" opacity=".5"/><circle cx="18" cy="20" r="5.5" fill="#8B5A2B"/><circle cx="46" cy="20" r="5.5" fill="#8B5A2B"/><circle cx="18" cy="20" r="2.6" fill="#C99A6B"/><circle cx="46" cy="20" r="2.6" fill="#C99A6B"/><circle cx="32" cy="35" r="20" fill="#8B5A2B"/><ellipse cx="32" cy="40" rx="13.5" ry="11" fill="#C99A6B"/><circle class="eye" cx="25.5" cy="33" r="2.7" fill="#13213A"/><circle class="eye" cx="38.5" cy="33" r="2.7" fill="#13213A"/><circle cx="26.4" cy="32.1" r=".9" fill="#fff"/><circle cx="39.4" cy="32.1" r=".9" fill="#fff"/><ellipse cx="32" cy="39.5" rx="3.4" ry="2.4" fill="#2B1B10"/><rect x="29" y="42.5" width="2.8" height="4.6" rx=".7" fill="#fff"/><rect x="32.3" y="42.5" width="2.8" height="4.6" rx=".7" fill="#fff"/><rect x="19" y="50" width="26" height="5" rx="2.5" fill="#136F63"/><path d="M40 52h8l-2 7-5-2z" fill="#136F63"/><circle cx="44" cy="56" r="1" fill="#E1F0EC"/></svg>`; }
-const AG={open:false,msgs:[],lastStep:-1,milestones:new Set(),unread:0,greeted:false};
+const AG={open:false,msgs:[],lastStep:-1,milestones:new Set(),unread:0,greeted:false,aiHist:[]};
 const normTxt=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[’'`]/g,' ').replace(/[^a-z0-9%$ ]+/g,' ').replace(/\s+/g,' ').trim();
 const LINKS={
   arc:{fr:'https://www.canada.ca/fr/agence-revenu/services/services-electroniques/services-numeriques-particuliers/dossier-particuliers.html',en:'https://www.canada.ca/en/revenue-agency/services/e-services/digital-services-individuals/account-individuals.html',t:['Mon dossier ARC','CRA My Account']},
@@ -1338,8 +1357,8 @@ const KB=[
 /* Intentions sur les chiffres de l’utilisateur */
 const INTENTS=[
   {k:'ou en suis where am i progression progress complete complet avancement status statut',fn:()=>{ const g=globalStats(), m=missingFields(); const nxt=m[0]; return {t:L(`Vous êtes à ${fmtPct(g.pct,0)} : ${g.done} réponses sur ${g.req}.${nxt?` Prochaine question : « ${lb(nxt.f.l)} » (étape ${lb(SECTIONS[nxt.sec].short)}).`:' Tout est répondu : direction le PDF.'}`,`You are at ${fmtPct(g.pct,0)}: ${g.done} answers out of ${g.req}.${nxt?` Next question: “${lb(nxt.f.l)}” (${lb(SECTIONS[nxt.sec].short)} step).`:' Everything is answered: on to the PDF.'}`),actions:[nxt?{label:L('Y aller','Go there'),field:nxt.f.k,sec:nxt.sec}:{label:L('Générer le PDF','Generate the PDF'),go:SECTIONS.length-1}]}; }},
-  {k:'patrimoine net worth bilan balance actifs passifs',fn:()=>C.totalAssets>0||C.totalLiab>0?{t:L(`Patrimoine net : ${fmtMoney(C.netWorth)} (${fmtMoney(C.totalAssets)} d’actifs, ${fmtMoney(C.totalLiab)} de passifs). Actifs investissables : ${fmtMoney(C.investable)}.`,`Net worth: ${fmtMoney(C.netWorth)} (${fmtMoney(C.totalAssets)} of assets, ${fmtMoney(C.totalLiab)} of liabilities). Investable assets: ${fmtMoney(C.investable)}.`)}:{t:L('Le bilan n’est pas encore rempli.','The balance sheet is not filled in yet.'),actions:[{label:L('Aller au bilan','Go to the balance sheet'),go:3}]}},
-  {k:'taux marginal marginal rate mon impot my tax',fn:()=>num(S.revenuA)>0?{t:L(`Taux marginal estimé : parent A ${fmtPct(C.marginalA,1)}${C.couple?`, parent B ${fmtPct(C.marginalB,1)}`:''}. Revenu net mensuel estimé du ménage : ${fmtMoney(C.netMonthlyEst)}.`,`Estimated marginal rate: parent A ${fmtPct(C.marginalA,1)}${C.couple?`, parent B ${fmtPct(C.marginalB,1)}`:''}. Estimated household monthly take-home pay: ${fmtMoney(C.netMonthlyEst)}.`)}:{t:L('Inscrivez d’abord les revenus à l’étape Famille.','Enter the incomes in the Family step first.'),actions:[{label:L('Aller à Famille','Go to Family'),go:1}]}},
+  {k:'patrimoine net worth bilan balance actifs passifs',fn:()=>C.totalAssets>0||C.totalLiab>0?{t:L(`Patrimoine net : ${fmtMoney(C.netWorth)} (${fmtMoney(C.totalAssets)} d’actifs, ${fmtMoney(C.totalLiab)} de passifs). Actifs investissables : ${fmtMoney(C.investable)}.`,`Net worth: ${fmtMoney(C.netWorth)} (${fmtMoney(C.totalAssets)} of assets, ${fmtMoney(C.totalLiab)} of liabilities). Investable assets: ${fmtMoney(C.investable)}.`)}:{t:L('Le bilan n’est pas encore rempli.','The balance sheet is not filled in yet.'),actions:[{label:L('Aller au bilan','Go to the balance sheet'),go:SECTIONS.findIndex(x=>x.id==='bilan')}]}},
+  {k:'taux marginal marginal rate mon impot my tax',fn:()=>num(S.revenuA)>0?{t:L(`Taux marginal estimé : parent A ${fmtPct(C.marginalA,1)}${C.couple?`, parent B ${fmtPct(C.marginalB,1)}`:''}. Revenu net mensuel estimé du ménage : ${fmtMoney(C.netMonthlyEst)}.`,`Estimated marginal rate: parent A ${fmtPct(C.marginalA,1)}${C.couple?`, parent B ${fmtPct(C.marginalB,1)}`:''}. Estimated household monthly take-home pay: ${fmtMoney(C.netMonthlyEst)}.`)}:{t:L('Inscrivez d’abord les revenus à l’étape Famille.','Enter the incomes in the Family step first.'),actions:[{label:L('Aller à Famille','Go to Family'),go:SECTIONS.findIndex(x=>x.id==='famille')}]}},
   {k:'fonds urgence emergency fund coussin',fn:()=>C.essentials>0?{t:L(`Fonds d’urgence : ${fmtNum(C.emergencyMonths,1)} mois de dépenses essentielles (${fmtMoney(num(S.comptes))} de liquidités pour ${fmtMoney(C.essentials)} par mois). Cible ${C.emergencyTarget} mois : il manque ${fmtMoney(C.emergencyGap)}.`,`Emergency fund: ${fmtNum(C.emergencyMonths,1)} months of essential expenses (${fmtMoney(num(S.comptes))} of cash for ${fmtMoney(C.essentials)} per month). Target ${C.emergencyTarget} months: ${fmtMoney(C.emergencyGap)} missing.`)}:null},
   {k:'conge parental leave rqap qpip mes prestations my benefits',fn:()=>C.rqap?{t:L(`Congé parental : prestations brutes estimées ${fmtMoney(C.rqap.grossA)} (parent A)${C.couple?` et ${fmtMoney(C.rqap.grossB)} (parent B)`:''}; revenu net du ménage pendant le congé ${fmtMoney(C.rqap.monthlyDuringA)} par mois; coussin requis ${fmtMoney(C.leaveTotalGap||0)}.`,`Parental leave: estimated gross benefits ${fmtMoney(C.rqap.grossA)} (parent A)${C.couple?` and ${fmtMoney(C.rqap.grossB)} (parent B)`:''}; household net income during the leave ${fmtMoney(C.rqap.monthlyDuringA)} per month; cushion needed ${fmtMoney(C.leaveTotalGap||0)}.`)}:null},
   {k:'allocations benefits ace ccb allocation famille mes allocations',fn:()=>C.kids>0&&num(S.revenuA)>0?{t:L(`Allocations estimées : ACE ${fmtMoney(C.aceNow)} et Allocation famille ${fmtMoney(C.afNow)} par année, soit ${fmtMoney(C.allocAnnualEst/12)} par mois sur le revenu habituel.`,`Estimated benefits: CCB ${fmtMoney(C.aceNow)} and Family Allowance ${fmtMoney(C.afNow)} per year, or ${fmtMoney(C.allocAnnualEst/12)} per month on usual income.`)}:null},
@@ -1375,7 +1394,7 @@ const TIPS={
   generer:{t:['Dernière ligne droite. Le PDF reprend tout, avec les priorités et la faisabilité des objectifs. Pour une révision approfondie, le mandat pour Claude est prêt à copier.','Home stretch. The PDF brings everything together, with the priorities and goal feasibility. For a deeper review, the mandate for Claude is ready to copy.'],q:[['Comment faire réviser mon plan ?','How do I get my plan reviewed?'],['Mes données sont-elles privées ?','Is my data private?']]}
 };
 /* Interface */
-function agentMsg(text,opts={}){ AG.msgs.push({from:opts.from||'agent',text,actions:opts.actions||[],t:Date.now()}); if(AG.msgs.length>60) AG.msgs.shift(); if(!AG.open&&(opts.from||'agent')==='agent'){ AG.unread++; } agentRender(); }
+function agentMsg(text,opts={}){ const m={from:opts.from||'agent',text,actions:opts.actions||[],t:Date.now()+Math.random(),pending:!!opts.pending,ai:!!opts.ai}; AG.msgs.push(m); if(AG.msgs.length>60) AG.msgs.shift(); if(!AG.open&&m.from==='agent'&&!m.pending){ AG.unread++; } agentRender(); return m; }
 function agentGreet(){ if(AG.greeted) return; AG.greeted=true; agentMsg(L('Salut, je suis Nickel, votre copilote. Je suis la progression, j’explique chaque étape et je réponds aux questions sur les comptes, les allocations, le congé parental ou vos propres chiffres. Touchez une suggestion ou écrivez-moi.','Hi, I am Nickel, your co-pilot. I track progress, explain each step and answer questions about accounts, benefits, parental leave or your own figures. Tap a suggestion or write to me.')); }
 function agentOnStep(i){ const sec=SECTIONS[i]; if(!sec) return; if(AG.lastStep===i) return; AG.lastStep=i; if(!AG.greeted) agentGreet(); const tip=TIPS[sec.id]; if(!tip) return; const key='step:'+sec.id+':'+LANG; if(AG.milestones.has(key)){ agentRender(); return; } AG.milestones.add(key); const st=sectionStats(sec); const head=sec.custom?'':L(`Étape ${i} : ${lb(sec.title)}${st.req?` (${st.done}/${st.req})`:''}. `,`Step ${i}: ${lb(sec.title)}${st.req?` (${st.done}/${st.req})`:''}. `); agentMsg(head+lb(tip.t)); }
 function agentOnProgress(){ const g=globalStats(); [25,50,75,100].forEach(m=>{ const key='ms:'+m; if(g.pct>=m&&!AG.milestones.has(key)){ AG.milestones.add(key); const msgs={25:L('Un quart du chemin. Le tableau de bord commence à parler : jetez un œil aux feux.','A quarter of the way. The dashboard is starting to speak: take a look at the status lights.'),50:L('Mi-parcours. Les priorités se précisent au fur et à mesure; n’hésitez pas à me demander « mes priorités ».','Halfway there. Priorities sharpen as you go; feel free to ask me “my priorities”.'),75:L('Trois quarts. Il reste les étapes de synthèse : objectifs, projections et plan d’action.','Three quarters. The synthesis steps remain: goals, projections and action plan.'),100:L('Barrage terminé : toutes les questions requises sont répondues. Le PDF est débloqué.','Dam complete: every required question is answered. The PDF is unlocked.')}; agentMsg(msgs[m],{actions:m===100?[{label:L('Générer le PDF','Generate the PDF'),go:SECTIONS.length-1}]:[]}); } }); }
@@ -1387,7 +1406,7 @@ function agentRender(){
   const badge=document.getElementById('agentBadge'); if(badge){ badge.textContent=AG.unread>9?'9+':String(AG.unread); badge.classList.toggle('show',AG.unread>0&&!AG.open); }
   panel.hidden=!AG.open; fab.classList.toggle('open',AG.open);
   if(!AG.open) return;
-  document.getElementById('agentSub').textContent=L('copilote du plan','plan co-pilot');
+  document.getElementById('agentSub').textContent=aiReady()&&AI.chat?L(`copilote IA · ${aiModel()}`,`AI co-pilot · ${aiModel()}`):L('copilote du plan','plan co-pilot');
   document.getElementById('agentName').textContent='Nickel';
   document.getElementById('agentProg').style.width=g.pct+'%';
   document.getElementById('agentPct').textContent=fmtPct(g.pct,0);
@@ -1395,16 +1414,148 @@ function agentRender(){
   const inp=document.getElementById('agentInput'); inp.placeholder=L('Posez une question…','Ask a question…');
   document.getElementById('agentSend').setAttribute('aria-label',L('Envoyer','Send'));
   const msgs=document.getElementById('agentMsgs');
-  msgs.innerHTML=AG.msgs.map(m=>`<div class="ag-msg from-${m.from}">${m.from==='agent'?`<div class="ag-ava">${beaverSVG(26)}</div>`:''}<div class="ag-bub">${esc(m.text).replace(/\n/g,'<br>')}${m.actions.length?`<div class="ag-actions">${m.actions.map((a,i)=>a.url?`<a class="ag-act" href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.label)} ↗</a>`:`<button type="button" class="ag-act" data-ag-action="${m.t}:${i}">${esc(a.label)}</button>`).join('')}</div>`:''}</div></div>`).join('');
+  msgs.innerHTML=AG.msgs.map(m=>`<div class="ag-msg from-${m.from}">${m.from==='agent'?`<div class="ag-ava">${beaverSVG(26)}</div>`:''}<div class="ag-bub${m.pending?' pending':''}">${m.pending?'<span class="ag-dots"><i></i><i></i><i></i></span>':esc(m.text).replace(/\n/g,'<br>')}${m.actions.length?`<div class="ag-actions">${m.actions.map((a,i)=>a.url?`<a class="ag-act" href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.label)} ↗</a>`:`<button type="button" class="ag-act" data-ag-action="${m.t}:${i}">${esc(a.label)}</button>`).join('')}</div>`:''}</div></div>`).join('');
   msgs.scrollTop=msgs.scrollHeight;
   document.getElementById('agentChips').innerHTML=agentChips().map(q=>`<button type="button" class="ag-chip" data-ag-q="${esc(q)}">${esc(q)}</button>`).join('');
 }
 function agentOpen(open){ AG.open=open; if(open){ AG.unread=0; agentGreet(); AG.lastStep=-1; agentOnStep(current); } agentRender(); if(open){ setTimeout(()=>{ const i=document.getElementById('agentInput'); if(i&&window.innerWidth>760) i.focus(); },50); } }
-function agentAsk(raw){ const q=String(raw||'').trim(); if(!q) return; agentMsg(q,{from:'user'}); const a=agentAnswer(q); if(a){ agentMsg(a.t,{actions:a.actions||[]}); return; } agentMsg(L('Je n’ai pas cette réponse dans ma base. Je peux copier votre question avec un résumé anonyme de votre situation pour la poser à Claude, ou vous pouvez consulter les sources officielles.','I do not have that answer in my base. I can copy your question with an anonymous summary of your situation to ask Claude, or you can check the official sources.'),{actions:[{label:L('Copier pour Claude','Copy for Claude'),claude:q},{label:L('Revenu Québec','Revenu Québec'),url:LANG==='en'?LINKS.rq.en:LINKS.rq.fr},{label:L('ARC','CRA'),url:LANG==='en'?LINKS.arc.en:LINKS.arc.fr}]}); }
+function agentAsk(raw){ const q=String(raw||'').trim(); if(!q) return; agentMsg(q,{from:'user'});
+  if(aiReady()&&AI.chat){ const pm=agentMsg('…',{pending:true}); aiChat(q,AG.aiHist).then(txt=>{ pm.text=txt||L('Réponse vide du modèle.','Empty model answer.'); pm.pending=false; pm.ai=true; AG.aiHist.push({role:'user',content:q},{role:'assistant',content:pm.text}); if(AG.aiHist.length>6) AG.aiHist=AG.aiHist.slice(-6); if(!AG.open) AG.unread++; agentRender(); }).catch(e=>{ const a=agentAnswer(q); pm.pending=false; pm.text=L(`L’IA n’a pas répondu (${e.message||e}). `,`The AI did not answer (${e.message||e}). `)+(a?a.t:L('Voici ce que je peux dire avec ma base intégrée : rien de précis sur ce point.','Here is what I can say from my built-in base: nothing specific on this point.')); pm.actions=a&&a.actions?a.actions:[]; agentRender(); }); return; }
+  const a=agentAnswer(q); if(a){ agentMsg(a.t,{actions:a.actions||[]}); return; } agentMsg(L('Je n’ai pas cette réponse dans ma base. Je peux copier votre question avec un résumé anonyme de votre situation pour la poser à Claude, ou vous pouvez consulter les sources officielles.','I do not have that answer in my base. I can copy your question with an anonymous summary of your situation to ask Claude, or you can check the official sources.'),{actions:[{label:L('Copier pour Claude','Copy for Claude'),claude:q},{label:L('Revenu Québec','Revenu Québec'),url:LANG==='en'?LINKS.rq.en:LINKS.rq.fr},{label:L('ARC','CRA'),url:LANG==='en'?LINKS.arc.en:LINKS.arc.fr}]}); }
 function agentContext(){ const g=globalStats(); const parts=[L(`Étape ${current} (${lb(SECTIONS[current].title)}), questionnaire à ${fmtPct(g.pct,0)}.`,`Step ${current} (${lb(SECTIONS[current].title)}), questionnaire at ${fmtPct(g.pct,0)}.`)]; if(has(S.statut)) parts.push(L(`Ménage : ${optK('statut',S.statut)}, ${C.kids} enfant(s), ${has(S.logement)?optK('logement',S.logement):''}.`,`Household: ${optK('statut',S.statut)}, ${C.kids} child(ren), ${has(S.logement)?optK('logement',S.logement):''}.`)); if(num(S.revenuA)>0) parts.push(L(`Revenus bruts : ${fmtMoney(num(S.revenuA))}${C.couple?` et ${fmtMoney(num(S.revenuB))}`:''}; net mensuel estimé ${fmtMoney(C.netMonthlyEst)}.`,`Gross incomes: ${fmtMoney(num(S.revenuA))}${C.couple?` and ${fmtMoney(num(S.revenuB))}`:''}; estimated monthly net ${fmtMoney(C.netMonthlyEst)}.`)); if(C.expenses>0) parts.push(L(`Dépenses ${fmtMoney(C.expenses)} par mois, capacité d’épargne ${fmtMoney(C.capacity)}.`,`Expenses ${fmtMoney(C.expenses)} per month, savings capacity ${fmtMoney(C.capacity)}.`)); if(C.totalAssets>0||C.totalLiab>0) parts.push(L(`Patrimoine net ${fmtMoney(C.netWorth)}.`,`Net worth ${fmtMoney(C.netWorth)}.`)); if(C.rqap) parts.push(L(`Congé parental prévu (${C.rqap.semA} semaines parent A).`,`Parental leave planned (${C.rqap.semA} weeks parent A).`)); if(C.goals.length) parts.push(L(`Objectifs : ${C.goals.map(g=>`${g.title} (${GOAL_STATUS(g.status)})`).join('; ')}.`,`Goals: ${C.goals.map(g=>`${g.title} (${GOAL_STATUS(g.status)})`).join('; ')}.`)); return parts.join(' '); }
 function agentToClaude(q){ const txt=L(`Question d’un utilisateur de l’outil « Plan de match financier, jeune famille Québec 2026 » : ${q}\n\nContexte (anonyme) : ${agentContext()}\n\nRéponds en tenant compte des règles fiscales et familiales du Québec et du Canada en vigueur en 2026, en distinguant faits, hypothèses et données manquantes.`,`Question from a user of the tool “Family financial game plan, young family Québec 2026”: ${q}\n\nContext (anonymous): ${agentContext()}\n\nAnswer taking into account the Québec and Canadian tax and family rules in force in 2026, separating facts, assumptions and missing data.`); const done=()=>{ toast(L('Question copiée; collez-la dans Claude.','Question copied; paste it into Claude.')); window.open('https://claude.ai/new','_blank','noopener'); }; if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(()=>fallbackCopy(txt,done)); else fallbackCopy(txt,done); }
 function agentAction(key){ const [t,i]=key.split(':'); const m=AG.msgs.find(x=>String(x.t)===t); if(!m) return; const a=m.actions[parseInt(i,10)]; if(!a) return; if(a.go!==undefined){ go(a.go); if(window.innerWidth<=760) agentOpen(false); } else if(a.field){ gotoField(a.field,a.sec); if(window.innerWidth<=760) agentOpen(false); } else if(a.claude){ agentToClaude(a.claude); } }
 function agentOnLang(){ AG.msgs=[]; AG.greeted=false; AG.lastStep=-1; Array.from(AG.milestones).forEach(k=>{ if(k.startsWith('step:')) AG.milestones.delete(k); }); if(AG.open){ agentGreet(); agentOnStep(current); } agentRender(); }
+</script>
+<script>
+/* ---------- Assistant IA (facultatif) : clé API de l’utilisateur, appels directs depuis le navigateur ---------- */
+const AI_KEY='planfam2026.ai.v1';
+const AI={provider:'none',key:'',remember:false,model:'',consent:false,chat:true,notes:true,analysis:true,tested:null,testedMsg:''};
+const AI_MODELS={
+  anthropic:[['claude-sonnet-5-5',['Claude Sonnet 5.5 (recommandé)','Claude Sonnet 5.5 (recommended)']],['claude-haiku-5-5',['Claude Haiku 5.5 (économique)','Claude Haiku 5.5 (budget)']],['claude-opus-5-5',['Claude Opus 5.5 (approfondi)','Claude Opus 5.5 (in-depth)']],['claude-fable-5-1',['Claude Fable 5.1 (le plus avancé)','Claude Fable 5.1 (most advanced)']]],
+  openai:[['gpt-5.6-sol',['GPT-5.6 Sol (recommandé)','GPT-5.6 Sol (recommended)']],['gpt-5.6-luna',['GPT-5.6 Luna (économique)','GPT-5.6 Luna (budget)']],['gpt-5.5',['GPT-5.5','GPT-5.5']],['gpt-5.4-mini',['GPT-5.4 mini (économique)','GPT-5.4 mini (budget)']]]
+};
+function aiLoad(){ try{ const l=localStorage.getItem(AI_KEY), s=sessionStorage.getItem(AI_KEY); const d=JSON.parse(l||s||'null'); if(d&&typeof d==='object'){ Object.assign(AI,d); AI.remember=!!l; } }catch(e){} }
+function aiSave(){ try{ const d={provider:AI.provider,key:AI.key,remember:AI.remember,model:AI.model,consent:AI.consent,chat:AI.chat,notes:AI.notes,analysis:AI.analysis,tested:AI.tested,testedMsg:AI.testedMsg}; if(AI.remember){ localStorage.setItem(AI_KEY,JSON.stringify(d)); sessionStorage.removeItem(AI_KEY); } else { sessionStorage.setItem(AI_KEY,JSON.stringify(d)); localStorage.removeItem(AI_KEY); } }catch(e){} }
+function aiForget(){ AI.key=''; AI.tested=null; AI.testedMsg=''; try{ localStorage.removeItem(AI_KEY); sessionStorage.removeItem(AI_KEY); }catch(e){} }
+const aiReady=()=>AI.provider!=='none'&&String(AI.key||'').trim().length>10&&!!AI.consent;
+const aiModel=()=>(AI.model&&AI.model.trim())||(AI.provider==='anthropic'?'claude-sonnet-5-5':'gpt-5.6-sol');
+const aiProviderName=()=>AI.provider==='anthropic'?'Claude (Anthropic)':(AI.provider==='openai'?'ChatGPT (OpenAI)':'');
+function aiErr(status,msg){ if(status===401||status===403) return L('Clé API refusée (401). Vérifiez la clé et le fournisseur choisi.','API key refused (401). Check the key and the selected provider.'); if(status===429) return L('Limite de requêtes atteinte ou crédit insuffisant (429).','Rate limit reached or insufficient credit (429).'); if(status===404) return L('Modèle introuvable (404) : choisissez un autre modèle.','Model not found (404): choose another model.'); return (msg||L('Erreur réseau ou blocage CORS. Vérifiez la connexion.','Network or CORS error. Check the connection.'))+(status?` (${status})`:''); }
+async function aiCall(system,user,maxTokens,history){
+  if(!aiReady()) throw new Error(L('Assistant IA non configuré (étape 1).','AI assistant not configured (step 1).'));
+  const model=aiModel(); const hist=(history||[]).map(h=>({role:h.role,content:h.content}));
+  let r,d;
+  if(AI.provider==='anthropic'){
+    r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':AI.key.trim(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model,max_tokens:maxTokens||1200,system,messages:[...hist,{role:'user',content:user}]})});
+    d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(aiErr(r.status,d&&d.error&&d.error.message));
+    return (d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n').trim();
+  }
+  r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'content-type':'application/json','authorization':'Bearer '+AI.key.trim()},body:JSON.stringify({model,max_completion_tokens:maxTokens||1200,messages:[{role:'system',content:system},...hist,{role:'user',content:user}]})});
+  d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(aiErr(r.status,d&&d.error&&d.error.message));
+  return ((d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'').trim();
+}
+function aiParseJSON(txt){ if(!txt) return null; let t=String(txt).replace(/```json|```/g,'').trim(); const a=t.indexOf('{'), b=t.lastIndexOf('}'); if(a>=0&&b>a) t=t.slice(a,b+1); try{ return JSON.parse(t); }catch(e){ const a2=t.indexOf('['), b2=t.lastIndexOf(']'); if(a2>=0&&b2>a2){ try{ return JSON.parse(t.slice(a2,b2+1)); }catch(e2){} } return null; } }
+const aiHash=()=>{ const s=JSON.stringify(Object.keys(S).filter(k=>FIELD_BY_KEY[k]).sort().map(k=>[k,S[k]])); let h=0; for(let i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; } return String(h); };
+
+/* Données anonymisées envoyées au modèle */
+function aiPayload(sectionId){
+  const rep={}; const secs=sectionId?SECTIONS.filter(x=>x.id===sectionId):SECTIONS;
+  secs.forEach(sec=>fieldsOf(sec).forEach(f=>{ if(['planName','prenomA','prenomB'].includes(f.k)) return; if(!fieldVisible(f)||!has(S[f.k])) return; rep[lb(f.l)]=f.t==='select'?optLabel(f,S[f.k]):S[f.k]; }));
+  const ind={}; const m=(k,v)=>{ if(v!==undefined&&v!==null&&!(typeof v==='number'&&isNaN(v))) ind[k]=typeof v==='number'?Math.round(v*100)/100:v; };
+  m(L('revenu_net_mensuel_estime','estimated_monthly_net_income'),C.netMonthly); m(L('allocations_mensuelles_estimees','estimated_monthly_benefits'),C.allocMonthly); m(L('depenses_mensuelles','monthly_expenses'),C.expenses); m(L('depenses_essentielles','essential_expenses'),C.essentials); m(L('capacite_epargne_mensuelle','monthly_savings_capacity'),C.capacity); m(L('taux_epargne_declare_pct','declared_savings_rate_pct'),C.savingsRate*100); m(L('fonds_urgence_mois','emergency_fund_months'),C.emergencyMonths); m(L('taux_marginal_A_pct','marginal_rate_A_pct'),C.marginalA); if(C.couple) m(L('taux_marginal_B_pct','marginal_rate_B_pct'),C.marginalB); m(L('patrimoine_net','net_worth'),C.netWorth); m(L('actifs_investissables','investable_assets'),C.investable); m(L('dettes_consommation','consumer_debt'),C.consumerDebt); m(L('cotisations_annuelles_prevues','planned_annual_contributions'),C.contribAnnual); m(L('ecart_plan_vs_capacite_annuel','plan_vs_capacity_gap_annual'),C.planVsCapacity);
+  if(C.rqap){ m(L('rqap_prestations_brutes_A','qpip_gross_benefits_A'),C.rqap.grossA); if(C.couple) m(L('rqap_prestations_brutes_B','qpip_gross_benefits_B'),C.rqap.grossB); m(L('revenu_net_mensuel_pendant_conge','monthly_net_income_during_leave'),C.leaveMonthlyIncome); m(L('coussin_conge_requis','leave_cushion_needed'),C.leaveTotalGap); }
+  if(C.kids>0){ m(L('ace_annuelle_estimee','ccb_annual_estimate'),C.aceNow); m(L('allocation_famille_annuelle_estimee','family_allowance_annual_estimate'),C.afNow); m(L('subventions_reee_annuelles','resp_grants_annual'),C.reeeGrants); }
+  if(C.home){ const h=C.home; ind[L('immobilier','home')]={[L('paiement_mensuel','monthly_payment')]:Math.round(h.payment),[L('cout_mensuel_complet','full_monthly_cost')]:Math.round(h.ownMonthly),[L('ratio_ABD_pct','GDS_pct')]:Math.round(h.gds*10)/10,[L('ratio_ATD_pct','TDS_pct')]:Math.round(h.tds*10)/10,[L('test_resistance','stress_test')]:h.passes?L('réussi','passed'):L('échoué','failed'),[L('frais_cloture_nets','net_closing_costs')]:Math.round(h.closingNet),[L('prix_max_estime','max_price_estimate')]:Math.round(h.maxPrice),[L('patrimoine_10ans_achat','wealth_buy')]:Math.round(h.buyWealth),[L('patrimoine_10ans_location','wealth_rent')]:Math.round(h.rentWealth)}; }
+  if(C.goals.length) ind[L('objectifs','goals')]=C.goals.map(g=>({[L('titre','title')]:g.title,[L('cible','target')]:g.target,[L('mis_de_cote','set_aside')]:g.saved,[L('mensuel_consacre','monthly_dedicated')]:g.monthly,[L('echeance','deadline')]:fmtMonthYear(g.deadline),[L('requis_par_mois','needed_per_month')]:g.needed===null?null:Math.round(g.needed),[L('verdict','verdict')]:GOAL_STATUS(g.status)}));
+  ind[L('projections_reelles','real_projections')]=C.proj.rows.map(r=>({[L('horizon_ans','horizon_years')]:r.N,[L('prudent','conservative')]:Math.round(r.vals[0].real),[L('central','central')]:Math.round(r.vals[1].real),[L('optimiste','optimistic')]:Math.round(r.vals[2].real)}));
+  ind[L('priorites_calculees_par_outil','tool_priorities')]=C.priorities.map(p=>p.title);
+  ind[L('feux','status_lights')]=C.lights.map(l=>`${l.label}: ${l.value} (${l.state})`);
+  const params={CELI_2026:P.celiPlafond,REER_2026:P.reerPlafond,CELIAPP_annuel:P.celiappAnnuel,CELIAPP_vie:P.celiappVie,RAP:P.rapMax,SCEE_pct:P.sceeTaux,IQEE_pct:P.iqeeTaux,RQAP_max_assurable:P.rqapMRA,ACE_max_moins_6:P.aceMoins6,Allocation_famille_max:P.afMax,Allocation_famille_min:P.afMin,garderie_par_jour:P.garderieCPE,droits_mutation_tranches:[P.dmT1,P.dmT2],taux_qualification_plancher:P.qualifPlancher};
+  return {[L('date','date')]:todayISO(),[L('langue','language')]:LANG,[L('reponses','answers')]:rep,[L('indicateurs_calcules','computed_indicators')]:ind,[L('parametres_2026','parameters_2026')]:params};
+}
+const AI_RULES=()=>L('Règles : utilise uniquement les chiffres fournis, n’invente aucun montant ni aucun taux; distingue faits, hypothèses et données manquantes; respecte les règles fiscales et familiales du Québec et du Canada en vigueur en 2026 (RQAP, ACE, Allocation famille, CELIAPP, REER, CELI, REEE, union parentale, droits de mutation); ne recommande aucun produit financier précis ni aucune activité non déclarée; rappelle qu’un planificateur financier, un fiscaliste ou un notaire doit valider; ton professionnel, concret, sans jargon inutile. Réponds en français.','Rules: use only the figures provided, never invent an amount or a rate; separate facts, assumptions and missing data; follow the Québec and Canadian tax and family rules in force in 2026 (QPIP, CCB, Family Allowance, FHSA, RRSP, TFSA, RESP, parental union, transfer duties); recommend no specific financial product and no undeclared activity; remind that a financial planner, tax specialist or notary must validate; professional, concrete tone, no needless jargon. Answer in English.');
+const AI_ROLE=()=>L('Tu es un planificateur financier et fiscaliste expérimenté, spécialisé dans les jeunes familles du Québec (Canada). Tu analyses un plan de match financier produit par un outil : réponses du ménage (anonymes), indicateurs calculés et paramètres 2026.','You are an experienced financial planner and tax specialist focused on young families in Québec (Canada). You analyze a financial game plan produced by a tool: the household’s (anonymous) answers, computed indicators and 2026 parameters.');
+
+/* Test de connexion */
+async function aiTest(){ const st=document.getElementById('aiStatus'); if(st){ st.className='status'; st.textContent=L('Test en cours…','Testing…'); } try{ const t=await aiCall(L('Réponds par un seul mot : OK.','Answer with a single word: OK.'),'ping',16,[]); AI.tested=true; AI.testedMsg=L(`Connexion réussie avec ${aiModel()}.`,`Connected successfully with ${aiModel()}.`); }catch(e){ AI.tested=false; AI.testedMsg=String(e.message||e); } aiSave(); renderSection(); agentRender(); }
+
+/* Observations par étape */
+async function aiNote(sectionId){
+  const sec=SECTIONS.find(x=>x.id===sectionId); if(!sec) return; const box=document.getElementById('aiNoteBox'); if(box){ box.innerHTML=`<div class="ai-wait">${L('Analyse de cette étape…','Analyzing this step…')}</div>`; }
+  try{
+    const sys=`${AI_ROLE()} ${AI_RULES()} ${L('Réponds UNIQUEMENT par un tableau JSON de 3 à 5 chaînes : des observations concrètes et utiles sur cette étape (erreurs probables, oublis, optimisations), 30 mots maximum chacune.','Answer ONLY with a JSON array of 3 to 5 strings: concrete, useful observations about this step (likely errors, omissions, optimizations), 30 words maximum each.')}`;
+    const payload=aiPayload(sectionId); payload[L('etape','step')]=lb(sec.title);
+    const full=aiPayload(); payload[L('indicateurs_calcules','computed_indicators')]=full[L('indicateurs_calcules','computed_indicators')];
+    const txt=await aiCall(sys,JSON.stringify(payload),700,[]); let arr=aiParseJSON(txt); if(!Array.isArray(arr)) arr=txt?[txt.slice(0,400)]:[];
+    S.aiNotes=S.aiNotes||{}; S.aiNotes[sectionId]={t:arr.map(x=>String(x)).slice(0,6),model:aiModel(),date:todayISO(),hash:aiHash()}; save();
+  }catch(e){ if(box) box.innerHTML=`<div class="status err">${esc(String(e.message||e))}</div>`; return; }
+  renderLive();
+}
+function aiNoteHTML(sectionId){
+  if(!aiReady()||!AI.notes) return '';
+  const n=S.aiNotes&&S.aiNotes[sectionId];
+  const stale=n&&n.hash!==aiHash();
+  return `<div class="ai-note" id="aiNoteBox">${n?`<div class="ai-note-head"><b>${L('Observations de l’IA','AI observations')}</b><span class="small muted">${esc(n.model)} · ${esc(n.date)}${stale?' · '+L('réponses modifiées depuis','answers changed since'):''}</span></div><ul>${n.t.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}<button type="button" class="btn" data-ai-note="${sectionId}">${n?L('Mettre à jour les observations','Refresh the observations'):L('Observations de l’IA sur cette étape','AI observations on this step')}</button></div>`;
+}
+
+/* Analyse approfondie pour le PDF */
+async function aiAnalysis(){
+  const st=document.getElementById('aiAnalysisStatus'); if(st){ st.className='status'; st.textContent=L('Analyse en cours (20 à 60 secondes)…','Analysis in progress (20 to 60 seconds)…'); }
+  try{
+    const schema=L('Réponds UNIQUEMENT avec un objet JSON valide, sans texte autour, selon ce schéma : {"resume": "120 à 200 mots, lecture d’ensemble de la situation et des priorités", "forces": ["3 à 5 points"], "risques": ["3 à 5 points"], "recommandations": [{"domaine": "Budget|Congé parental|Comptes enregistrés|Dettes|Immobilier|Protection|Objectifs|Revenus|Fiscalité", "titre": "...", "detail": "2 à 3 phrases chiffrées à partir des données", "impact": "élevé|moyen|faible", "echeance": "0-30 jours|30-90 jours|3-6 mois|6-12 mois"}] (6 à 10 éléments), "objectifs": [{"titre": "...", "avis": "1 à 2 phrases sur la faisabilité et le levier principal"}], "plan12mois": [{"periode": "...", "actions": ["..."]}] (4 ou 5 périodes), "questions_conseiller": ["3 à 6 questions précises"], "verifications": ["données incohérentes ou à confirmer"], "avertissement": "1 phrase"}','Answer ONLY with a valid JSON object, no surrounding text, following this schema: {"resume": "120 to 200 words, overall reading of the situation and priorities", "forces": ["3 to 5 points"], "risques": ["3 to 5 points"], "recommandations": [{"domaine": "Budget|Parental leave|Registered accounts|Debts|Home|Protection|Goals|Income|Taxation", "titre": "...", "detail": "2 to 3 sentences with figures from the data", "impact": "high|medium|low", "echeance": "0-30 days|30-90 days|3-6 months|6-12 months"}] (6 to 10 items), "objectifs": [{"titre": "...", "avis": "1 to 2 sentences on feasibility and the main lever"}], "plan12mois": [{"periode": "...", "actions": ["..."]}] (4 or 5 periods), "questions_conseiller": ["3 to 6 precise questions"], "verifications": ["inconsistent data or data to confirm"], "avertissement": "1 sentence"}');
+    const sys=`${AI_ROLE()} ${AI_RULES()} ${schema}`;
+    const txt=await aiCall(sys,JSON.stringify(aiPayload()),3200,[]);
+    const obj=aiParseJSON(txt); if(!obj||typeof obj!=='object'||Array.isArray(obj)) throw new Error(L('Réponse inattendue du modèle; réessayez.','Unexpected model answer; try again.'));
+    S.aiAnalysis={...obj,model:aiModel(),provider:aiProviderName(),date:todayISO(),hash:aiHash(),lang:LANG}; save();
+  }catch(e){ if(st){ st.className='status err'; st.textContent=String(e.message||e); } return; }
+  renderSection(); const st2=document.getElementById('aiAnalysisStatus'); if(st2){ st2.className='status ok'; st2.textContent=L('Analyse produite et enregistrée; elle sera incluse dans le PDF.','Analysis produced and saved; it will be included in the PDF.'); } toast(L('Analyse IA enregistrée','AI analysis saved'));
+}
+function aiAnalysisHTML(){
+  if(!aiReady()||!AI.analysis) return `<div class="ai-card"><h3>${L('Analyse approfondie par IA','In-depth AI analysis')}</h3><p class="small muted">${L('Configurez un assistant IA à l’étape 1 (clé API Claude ou OpenAI) pour ajouter au PDF une analyse rédigée : forces, risques, recommandations chiffrées, avis sur chaque objectif, plan sur 12 mois et questions pour votre conseiller.','Set up an AI assistant in step 1 (Claude or OpenAI API key) to add a written analysis to the PDF: strengths, risks, figure-based recommendations, an opinion on each goal, a 12-month plan and questions for your advisor.')}</p><button class="btn" type="button" data-go="${SECTIONS.findIndex(x=>x.id==='ia')}">${L('Configurer l’assistant IA','Set up the AI assistant')}</button></div>`;
+  const a=S.aiAnalysis; const stale=a&&a.hash!==aiHash();
+  return `<div class="ai-card"><h3>${L('Analyse approfondie par IA','In-depth AI analysis')} <span class="small muted">${esc(aiProviderName())} · ${esc(aiModel())}</span></h3>
+  ${a?`<p class="small muted">${L(`Produite le ${a.date} avec ${a.model}.`,`Produced on ${a.date} with ${a.model}.`)} ${stale?`<span style="color:var(--honey)">${L('Des réponses ont changé depuis : refaites l’analyse avant le PDF.','Some answers changed since: redo the analysis before the PDF.')}</span>`:L('Elle sera incluse dans le PDF.','It will be included in the PDF.')}</p><p class="ai-resume">${esc(a.resume||'')}</p>${Array.isArray(a.recommandations)&&a.recommandations.length?`<ol class="ai-list">${a.recommandations.slice(0,10).map(r=>`<li><b>${esc(r.titre||'')}</b> <span class="small muted">${esc([r.domaine,r.impact,r.echeance].filter(Boolean).join(' · '))}</span><br>${esc(r.detail||'')}</li>`).join('')}</ol>`:''}`:`<p class="small muted">${L('L’analyse lit vos réponses anonymisées et les indicateurs calculés, puis rédige : résumé, forces, risques, recommandations chiffrées, avis sur chaque objectif, plan sur 12 mois, questions pour le conseiller et vérifications de cohérence. Quelques cents par analyse selon le modèle.','The analysis reads your anonymized answers and the computed indicators, then writes: summary, strengths, risks, figure-based recommendations, an opinion on each goal, a 12-month plan, questions for the advisor and consistency checks. A few cents per analysis depending on the model.')}</p>`}
+  <div class="btn-row"><button class="btn primary" type="button" id="btnAiAnalysis">${a?L('Refaire l’analyse IA','Redo the AI analysis'):L('Produire l’analyse IA','Produce the AI analysis')}</button></div><div class="status" id="aiAnalysisStatus"></div></div>`;
+}
+
+/* Conversation libre pour Nickel */
+async function aiChat(question,history){
+  const sys=`${AI_ROLE()} ${AI_RULES()} ${L('Tu es Nickel, le copilote de l’outil. Réponds à la question de l’utilisateur en 150 mots maximum, de façon directe et chaleureuse, en t’appuyant sur le contexte fourni (réponses et indicateurs). Si une information manque, dis-le et indique où la trouver (Mon dossier ARC, Revenu Québec, RQAP, Retraite Québec, notaire). Pas de JSON, texte simple.','You are Nickel, the tool’s co-pilot. Answer the user’s question in 150 words maximum, directly and warmly, relying on the provided context (answers and indicators). If information is missing, say so and point to where to find it (CRA My Account, Revenu Québec, QPIP, Retraite Québec, notary). No JSON, plain text.')}`;
+  const user=`${L('Contexte','Context')} : ${JSON.stringify(aiPayload())}\n\n${L('Étape actuelle','Current step')} : ${lb(SECTIONS[current].title)}\n${L('Question','Question')} : ${question}`;
+  return aiCall(sys,user,600,history||[]);
+}
+
+/* Étape de configuration */
+function aiStepHTML(){
+  const models=AI.provider!=='none'?AI_MODELS[AI.provider]:[]; const known=models.some(m=>m[0]===AI.model)||!AI.model;
+  const idx=SECTIONS.findIndex(x=>x.id==='ia');
+  return `<div class="panel-head"><div><div class="step-kicker">${L('Étape','Step')} ${idx} ${L('sur','of')} ${SECTIONS.length-1} · ${L('facultatif','optional')}</div><h2>${L('Assistant IA (facultatif)','AI assistant (optional)')}</h2></div><span class="state ${aiReady()?'done':''}">${aiReady()?L('Activé','Enabled'):L('Non activé','Not enabled')}</span></div>
+  <p class="intro">${L('Si vous disposez d’une clé API Claude (Anthropic) ou ChatGPT (OpenAI), l’outil peut l’utiliser pour aller plus loin. Sans clé, tout fonctionne quand même avec les calculs intégrés et la base de connaissances de Nickel.','If you have a Claude (Anthropic) or ChatGPT (OpenAI) API key, the tool can use it to go further. Without a key, everything still works with the built-in calculations and Nickel’s knowledge base.')}</p>
+  <div class="welcome-grid" style="margin-top:0">
+    <div><b>${L('Nickel en conversation libre','Nickel in free conversation')}</b><p>${L('Il répond à toute question avec vos chiffres sous les yeux, au lieu d’une base de réponses fixes.','It answers any question with your figures in view, instead of a fixed answer base.')}</p></div>
+    <div><b>${L('Observations à chaque étape','Observations at each step')}</b><p>${L('Un bouton par étape : erreurs probables, oublis, optimisations, à partir de ce que vous venez de saisir.','One button per step: likely errors, omissions, optimizations, based on what you just entered.')}</p></div>
+    <div><b>${L('Analyse approfondie dans le PDF','In-depth analysis in the PDF')}</b><p>${L('Résumé, forces, risques, recommandations chiffrées, avis sur chaque objectif, plan sur 12 mois, questions pour votre conseiller.','Summary, strengths, risks, figure-based recommendations, an opinion on each goal, a 12-month plan, questions for your advisor.')}</p></div>
+  </div>
+  <fieldset class="fieldset" style="margin-top:22px"><legend>${L('Fournisseur et clé','Provider and key')}</legend>
+    <div class="grid">
+      <div class="field"><label for="ai_provider">${L('Fournisseur','Provider')}</label><div class="control"><select id="ai_provider" data-ai="provider"><option value="none" ${AI.provider==='none'?'selected':''}>${L('Aucun (mode intégré seulement)','None (built-in mode only)')}</option><option value="anthropic" ${AI.provider==='anthropic'?'selected':''}>Claude (Anthropic)</option><option value="openai" ${AI.provider==='openai'?'selected':''}>ChatGPT (OpenAI)</option></select></div></div>
+      ${AI.provider!=='none'?`<div class="field"><label for="ai_model">${L('Modèle','Model')}</label><div class="control"><select id="ai_model" data-ai="modelSelect">${models.map(m=>`<option value="${m[0]}" ${aiModel()===m[0]&&known?'selected':''}>${esc(lb(m[1]))}</option>`).join('')}<option value="__custom" ${!known?'selected':''}>${L('Autre (saisir l’identifiant)','Other (enter the identifier)')}</option></select></div><div class="help">${L('Les identifiants de modèles évoluent; la liste officielle est sur le site du fournisseur.','Model identifiers evolve; the official list is on the provider’s site.')}</div></div>
+      ${!known?`<div class="field"><label for="ai_model_custom">${L('Identifiant du modèle','Model identifier')}</label><div class="control"><input id="ai_model_custom" data-ai="model" type="text" value="${esc(AI.model)}" placeholder="${AI.provider==='anthropic'?'claude-…':'gpt-…'}" autocomplete="off"></div></div>`:''}
+      <div class="field span2"><label for="ai_key">${L('Clé API','API key')}</label><div class="control ai-key"><input id="ai_key" data-ai="key" type="${AI.showKey?'text':'password'}" value="${esc(AI.key||'')}" placeholder="${AI.provider==='anthropic'?'sk-ant-…':'sk-…'}" autocomplete="off" spellcheck="false"><button type="button" class="ai-eye" data-ai-eye="1" aria-label="${L('Afficher ou masquer','Show or hide')}">${AI.showKey?L('Masquer','Hide'):L('Afficher','Show')}</button></div><div class="help">${AI.provider==='anthropic'?L('Clé créée dans console.anthropic.com (Settings, API keys). Facturation à l’usage sur votre compte.','Key created in console.anthropic.com (Settings, API keys). Pay-as-you-go billing on your account.'):L('Clé créée dans platform.openai.com (API keys). Facturation à l’usage sur votre compte.','Key created in platform.openai.com (API keys). Pay-as-you-go billing on your account.')}</div></div>
+      <div class="field span2"><div class="check"><input id="ai_remember" data-ai="remember" type="checkbox" ${AI.remember?'checked':''}><label for="ai_remember">${L('Mémoriser la clé sur cet appareil (sinon, elle est oubliée à la fermeture de l’onglet)','Remember the key on this device (otherwise it is forgotten when the tab closes)')}</label></div></div>
+      <div class="field span2"><div class="check"><input id="ai_consent" data-ai="consent" type="checkbox" ${AI.consent?'checked':''}><label for="ai_consent">${L('Je comprends que mes réponses (sans nom ni prénom) et les indicateurs calculés seront envoyés au fournisseur choisi, sous ses conditions d’utilisation, chaque fois que je demande une observation, une analyse ou une réponse de Nickel.','I understand that my answers (without names) and the computed indicators will be sent to the selected provider, under its terms of use, each time I request an observation, an analysis or an answer from Nickel.')}</label></div></div>
+      <div class="field"><div class="check"><input id="ai_chat" data-ai="chat" type="checkbox" ${AI.chat?'checked':''}><label for="ai_chat">${L('Nickel en conversation libre','Nickel in free conversation')}</label></div></div>
+      <div class="field"><div class="check"><input id="ai_notes" data-ai="notes" type="checkbox" ${AI.notes?'checked':''}><label for="ai_notes">${L('Bouton d’observations à chaque étape','Observations button at each step')}</label></div></div>
+      <div class="field span2"><div class="check"><input id="ai_analysis" data-ai="analysis" type="checkbox" ${AI.analysis?'checked':''}><label for="ai_analysis">${L('Analyse approfondie à l’étape finale, incluse dans le PDF','In-depth analysis at the final step, included in the PDF')}</label></div></div>
+`:''}
+    </div>
+    ${AI.provider!=='none'?`<div class="btn-row" style="margin-top:14px"><button class="btn primary" type="button" id="btnAiTest" ${aiReady()?'':'disabled'}>${L('Tester la connexion','Test the connection')}</button><button class="btn danger" type="button" id="btnAiForget" ${AI.key?'':'disabled'}>${L('Oublier la clé','Forget the key')}</button></div>
+    <div class="status ${AI.tested===true?'ok':(AI.tested===false?'err':'')}" id="aiStatus">${AI.tested===null?(!AI.consent?L('Cochez la case de consentement pour activer.','Tick the consent box to enable.'):''):esc(AI.testedMsg)}</div>`:''}
+  </fieldset>
+  <div class="note warn"><p><b>${L('Confidentialité et coûts.','Privacy and costs.')}</b> ${L('La clé n’est jamais envoyée ailleurs qu’au fournisseur choisi et n’apparaît ni dans le PDF ni dans l’export JSON. Les appels partent directement de votre navigateur; aucun serveur intermédiaire. N’utilisez pas cette option sur un appareil partagé. Chaque observation coûte généralement moins d’un cent, chaque analyse complète quelques cents, selon le modèle. Les réponses de l’IA sont des suggestions à valider, pas un conseil réglementé.','The key is never sent anywhere but to the selected provider and appears neither in the PDF nor in the JSON export. Calls go directly from your browser; no intermediate server. Do not use this option on a shared device. Each observation usually costs under a cent, each full analysis a few cents, depending on the model. AI answers are suggestions to validate, not regulated advice.')}</p></div>
+  ${footHTML()}`;
+}
 </script>
 <script>
 /* ---------- PDF ---------- */
@@ -1449,6 +1600,27 @@ function roadmap(C){
   ];
   return {table:{widths:[86,'*'],body:blocks.map(b=>[{text:b[0],style:'cellL',bold:true,color:PDF.pine},{ul:b[1].map(t=>({text:t,style:'cellL'})),margin:[0,0,0,0]}])},layout:LAYOUT_CLEAN,margin:[0,0,0,8]};
 }
+function aiNotesBlock(sectionId){ const n=S.aiNotes&&S.aiNotes[sectionId]; if(!n||!Array.isArray(n.t)||!n.t.length) return []; return [{unbreakable:true,table:{widths:['*'],body:[[{stack:[{text:L(`Observations de l’IA (${n.model}, ${n.date})`,`AI observations (${n.model}, ${n.date})`),style:'cellS',bold:true,margin:[0,0,0,3]},{ul:n.t.map(t=>({text:t,style:'small'}))}],margin:[8,6,8,6]}]]},layout:{hLineWidth:()=>0,vLineWidth:(i)=>i===0?3:0,vLineColor:()=>PDF.pine,paddingLeft:()=>8,paddingRight:()=>6,paddingTop:()=>2,paddingBottom:()=>2,fillColor:()=>PDF.pineSoft},margin:[0,8,0,6]}]; }
+function aiAnalysisPages(C){
+  const a=S.aiAnalysis; if(!a) return []; const stale=a.hash!==aiHash(); const out=[];
+  const arr=x=>Array.isArray(x)?x:[]; const str=x=>x===null||x===undefined?'':String(x);
+  out.push({text:'',pageBreak:'after'});
+  out.push(H2(L('Analyse approfondie par IA','In-depth AI analysis')));
+  out.push(smallNote(L(`Rédigée par ${str(a.provider)}, modèle ${str(a.model)}, le ${str(a.date)}, à partir des réponses anonymisées et des indicateurs calculés par l’outil.${stale?' Certaines réponses ont été modifiées après cette analyse.':''} Les propositions ci-dessous sont des suggestions à valider par un professionnel.`,`Written by ${str(a.provider)}, model ${str(a.model)}, on ${str(a.date)}, from the anonymized answers and the indicators computed by the tool.${stale?' Some answers were changed after this analysis.':''} The proposals below are suggestions to be validated by a professional.`)));
+  if(a.resume) out.push({text:str(a.resume),style:'body',margin:[0,0,0,10]});
+  const forces=arr(a.forces).map(str), risques=arr(a.risques).map(str);
+  if(forces.length||risques.length) out.push({columns:[{width:'*',stack:[H3(L('Forces','Strengths'),[0,0,0,4]),{ul:forces.map(t=>({text:t,style:'body',margin:[0,0,0,2]}))}]},{width:'*',stack:[H3(L('Risques','Risks'),[0,0,0,4]),{ul:risques.map(t=>({text:t,style:'body',margin:[0,0,0,2]}))}]}],columnGap:18,margin:[0,0,0,8]});
+  const recs=arr(a.recommandations).filter(r=>r&&typeof r==='object');
+  if(recs.length){ out.push(H3(L('Recommandations','Recommendations'))); out.push({table:{widths:[18,'*',52,70],body:[[{text:'#',style:'th'},{text:L('Recommandation','Recommendation'),style:'th'},{text:L('Impact','Impact'),style:'th'},{text:L('Échéance','Timing'),style:'th'}]].concat(recs.slice(0,10).map((r,i)=>[{text:String(i+1),style:'cellL',color:PDF.pine,bold:true},{stack:[{text:str(r.titre),style:'cellL',bold:true},{text:[str(r.domaine)?str(r.domaine)+'. ':'',str(r.detail)].join(''),style:'cellS'}]},{text:str(r.impact),style:'cellL'},{text:str(r.echeance),style:'cellL'}]))},layout:LAYOUT_CLEAN,margin:[0,0,0,8]}); }
+  const objs=arr(a.objectifs).filter(o=>o&&typeof o==='object');
+  if(objs.length){ out.push(H3(L('Avis sur les objectifs','Opinion on the goals'))); out.push({ul:objs.map(o=>({text:[{text:str(o.titre)+' : ',bold:true},str(o.avis)],style:'body',margin:[0,0,0,3]}))}); }
+  const plan=arr(a.plan12mois).filter(p=>p&&typeof p==='object');
+  if(plan.length){ out.push(H3(L('Plan sur 12 mois proposé par l’IA','12-month plan proposed by the AI'))); out.push({table:{widths:[90,'*'],body:plan.slice(0,6).map(p=>[{text:str(p.periode),style:'cellL',bold:true,color:PDF.pine},{ul:arr(p.actions).map(t=>({text:str(t),style:'cellL'}))}])},layout:LAYOUT_CLEAN,margin:[0,0,0,8]}); }
+  const qs=arr(a.questions_conseiller).map(str).filter(Boolean), ver=arr(a.verifications).map(str).filter(Boolean);
+  if(qs.length||ver.length) out.push({columns:[{width:'*',stack:[H3(L('Questions pour le conseiller','Questions for the advisor'),[0,0,0,4]),{ul:qs.map(t=>({text:t,style:'small',margin:[0,0,0,2]}))}]},{width:'*',stack:[H3(L('Données à vérifier','Data to check'),[0,0,0,4]),{ul:ver.map(t=>({text:t,style:'small',margin:[0,0,0,2]}))}]}],columnGap:18});
+  if(a.avertissement) out.push({text:str(a.avertissement),style:'small',italics:true,margin:[0,8,0,0]});
+  return out;
+}
 function buildDoc(C){
   const couple=C.couple, name=S.planName||L('Plan de match financier','Family financial game plan'), date=dateLoc();
   const A=S.prenomA||L('Parent A','Parent A'), B=S.prenomB||L('Parent B','Parent B');
@@ -1462,8 +1634,9 @@ function buildDoc(C){
   content.push({text:[{text:L('Préparé le ','Prepared on '),color:'#B9C4D9'},{text:date,color:'#FFFFFF'}],fontSize:11,absolutePosition:{x:44,y:352}});
   content.push({text:[{text:L('Ménage : ','Household: '),color:'#B9C4D9'},{text:hh,color:'#FFFFFF'}],fontSize:11,absolutePosition:{x:44,y:370}});
   content.push({text:[{text:L('Parents : ','Parents: '),color:'#B9C4D9'},{text:couple?`${A} ${L('et','and')} ${B}`:A,color:'#FFFFFF'}],fontSize:11,absolutePosition:{x:44,y:388}});
+  if(S.aiAnalysis) content.push({text:[{text:L('Analyse IA : ','AI analysis: '),color:'#B9C4D9'},{text:`${S.aiAnalysis.provider||''}, ${S.aiAnalysis.model||''} (${S.aiAnalysis.date||''})`,color:'#FFFFFF'}],fontSize:11,absolutePosition:{x:44,y:406}});
   content.push({text:L('Contenu','Contents'),color:'#B9C4D9',fontSize:10,absolutePosition:{x:44,y:440}});
-  const toc=[L('Sommaire exécutif et priorités','Executive summary and priorities'),L('Famille, revenus et congé parental','Family, income and parental leave'),L('Budget mensuel','Monthly budget'),L('Actifs, passifs et dettes','Assets, liabilities and debts'),L('Comptes enregistrés et fiscalité','Registered accounts and taxation'),...(C.goals.length?[L('Objectifs et rêves : faisabilité','Goals and dreams: feasibility')]:[]),...(C.home?[L('Projet immobilier','Home purchase project')]:[]),L('Projections','Projections'),L('Protection, succession et cadre juridique','Protection, estate and legal framework'),L('Feuille de route de 12 mois','12-month roadmap'),L('Hypothèses, paramètres 2026 et sources','Assumptions, 2026 parameters and sources')];
+  const toc=[L('Sommaire exécutif et priorités','Executive summary and priorities'),...(S.aiAnalysis?[L('Analyse approfondie par IA','In-depth AI analysis')]:[]),L('Famille, revenus et congé parental','Family, income and parental leave'),L('Budget mensuel','Monthly budget'),L('Actifs, passifs et dettes','Assets, liabilities and debts'),L('Comptes enregistrés et fiscalité','Registered accounts and taxation'),...(C.goals.length?[L('Objectifs et rêves : faisabilité','Goals and dreams: feasibility')]:[]),...(C.home?[L('Projet immobilier','Home purchase project')]:[]),L('Projections','Projections'),L('Protection, succession et cadre juridique','Protection, estate and legal framework'),L('Feuille de route de 12 mois','12-month roadmap'),L('Hypothèses, paramètres 2026 et sources','Assumptions, 2026 parameters and sources')];
   content.push({ul:toc,color:'#FFFFFF',fontSize:10.5,lineHeight:1.35,absolutePosition:{x:44,y:456}});
   content.push({text:L('Confidentiel. Ce document contient des renseignements financiers personnels et a été produit localement par l’outil, sans transmission de données. Il fournit de l’information générale et des estimations fondées sur les paramètres 2026; il ne constitue pas un conseil financier, fiscal ou juridique. Faites-le réviser par un planificateur financier, un fiscaliste ou un notaire.','Confidential. This document contains personal financial information and was produced locally by the tool, with no data transmission. It provides general information and estimates based on 2026 parameters; it is not financial, tax or legal advice. Have it reviewed by a financial planner, a tax specialist or a notary.'),color:'#8E9BB5',fontSize:8.5,absolutePosition:{x:44,y:700},width:524});
   /* Sommaire exécutif */
@@ -1485,6 +1658,8 @@ function buildDoc(C){
   content.push(H3(L('Priorités classées selon vos réponses','Priorities ranked from your answers')));
   if(C.priorities.length){ content.push({table:{widths:[22,'*'],body:C.priorities.slice(0,6).map(p=>[{text:String(p.rank).padStart(2,'0'),style:'cellL',color:PDF.pine,bold:true},{stack:[{text:p.title,style:'cellL',bold:true},{text:p.detail,style:'cellS'}]}])},layout:LAYOUT_CLEAN}); }
   else content.push(para(L('Aucune priorité détectée : les indicateurs sont dans les cibles. Maintenez le rythme et révisez le plan à la date prévue.','No priority detected: the indicators are within target. Keep the pace and review the plan on the planned date.')));
+  /* Analyse IA */
+  content.push(...aiAnalysisPages(C));
   /* Famille et congé */
   content.push({text:'',pageBreak:'after'});
   content.push(H2(L('Famille, revenus et congé parental','Family, income and parental leave')));
@@ -1508,6 +1683,7 @@ function buildDoc(C){
     if(left.length&&right.length) content.push({columns:[{width:'54%',stack:left},{width:'*',stack:right}],columnGap:18});
     else if(left.length) content.push({stack:left}); else if(right.length) content.push({stack:right});
   }
+  content.push(...aiNotesBlock('famille'));
   /* Budget */
   content.push({text:'',pageBreak:'after'});
   content.push(H2(L('Budget mensuel','Monthly budget')));
@@ -1518,6 +1694,7 @@ function buildDoc(C){
   ],columnGap:16});
   if(C.rqap&&C.expenses>0){ content.push(H3(L('Avant et pendant le congé parental','Before and during parental leave'))); content.push({table:{widths:['*',100,100],body:[[{text:'',style:'th'},{text:L('Revenu habituel','Usual income'),style:'th',alignment:'right'},{text:L(`Pendant le congé de ${A}`,`During ${A}’s leave`),style:'th',alignment:'right'}],[{text:L('Revenu net + allocations','Net income + benefits'),style:'cellL'},{text:fmtMoney(C.income),style:'cellR'},{text:fmtMoney(C.leaveMonthlyIncome),style:'cellR'}],[{text:L('Dépenses','Expenses'),style:'cellL'},{text:fmtMoney(C.expenses),style:'cellR'},{text:fmtMoney(C.expenses),style:'cellR'}],[{text:L('Solde mensuel','Monthly balance'),style:'cellL',bold:true},{text:fmtMoney(C.capacity),style:'cellR',bold:true},{text:fmtMoney(C.leaveMonthlyIncome-C.expenses),style:'cellR',bold:true,color:C.leaveMonthlyIncome-C.expenses<0?PDF.rouge:PDF.ink}]]},layout:LAYOUT_CLEAN,margin:[0,0,0,8]}); content.push(callout(C.leaveTotalGap>0?L(`Sur ${fmtNum(C.rqap.monthsA,1)} mois de congé, l’écart cumulé atteint ${fmtMoney(C.leaveTotalGap)}. Liquidités actuelles : ${fmtMoney(num(S.comptes))}. ${num(S.comptes)>=C.leaveTotalGap?'Le coussin est couvert; les cotisations peuvent se poursuivre à rythme réduit.':'Constituer ce coussin avant le début du congé, ou réduire temporairement les cotisations non subventionnées (CELI, REER) tout en maintenant le REEE.'}`,`Over ${fmtNum(C.rqap.monthsA,1)} months of leave, the cumulative gap reaches ${fmtMoney(C.leaveTotalGap)}. Current cash: ${fmtMoney(num(S.comptes))}. ${num(S.comptes)>=C.leaveTotalGap?'The cushion is covered; contributions can continue at a reduced pace.':'Build this cushion before the leave starts, or temporarily reduce unsubsidized contributions (TFSA, RRSP) while keeping the RESP.'}`):L('Le revenu pendant le congé couvre les dépenses déclarées. Les cotisations peuvent se poursuivre; maintenir le REEE en priorité.','Income during the leave covers the declared expenses. Contributions can continue; keep the RESP as the priority.'),C.leaveTotalGap>0?'warn':'ok')); }
   if(C.garderie) content.push(para(L(`Garderie : ${optK('garderieType',S.garderieType)}. Coût brut estimé ${fmtMoney(C.garderie.brut)} par mois (21 jours), coût net environ ${fmtMoney(C.garderie.net)} après le crédit d’impôt du Québec (${fmtPct(P.creditGarde,0)} présumé) et la déduction fédérale du parent au revenu le plus bas. Contribution réduite 2026 : ${fmtMoney(P.garderieCPE,2)} par jour.`,`Daycare: ${optK('garderieType',S.garderieType)}. Estimated gross cost ${fmtMoney(C.garderie.brut)} per month (21 days), net cost about ${fmtMoney(C.garderie.net)} after the Québec tax credit (${fmtPct(P.creditGarde,0)} assumed) and the federal deduction of the lower-income parent. Reduced contribution 2026: ${fmtMoney(P.garderieCPE,2)} per day.`)));
+  content.push(...aiNotesBlock('budget'));
   /* Bilan */
   content.push({text:'',pageBreak:'after'});
   content.push(H2(L('Actifs, passifs et dettes','Assets, liabilities and debts')));
@@ -1536,6 +1713,7 @@ function buildDoc(C){
   if(C.liab.marge>0) debtRows.push([L(`Marge ou prêt personnel : ${fmtMoney(C.liab.marge)} à ${fmtPct(C.margeRate,2)}`,`Line of credit or personal loan: ${fmtMoney(C.liab.marge)} at ${fmtPct(C.margeRate,2)}`),L(`Environ ${fmtMoney(C.margeInterest)} d’intérêts par année. Priorité après les cartes.`,`About ${fmtMoney(C.margeInterest)} of interest per year. Priority after the cards.`)]);
   if(C.liab.autres>0) debtRows.push([L(`Autres dettes : ${fmtMoney(C.liab.autres)}`,`Other debts: ${fmtMoney(C.liab.autres)}`),L('Vérifier le taux; un prêt étudiant à faible taux avec crédit d’impôt sur les intérêts passe après les comptes enregistrés.','Check the rate; a low-rate student loan with an interest tax credit comes after the registered accounts.')]);
   if(debtRows.length) content.push({table:{widths:['38%','*'],body:debtRows.map(r=>[{text:r[0],style:'cellL',bold:true},{text:r[1],style:'cellL'}])},layout:LAYOUT_CLEAN}); else content.push(para(L('Aucune dette à la consommation déclarée. La capacité d’épargne peut aller entièrement aux objectifs.','No consumer debt declared. The full savings capacity can go to the goals.')));
+  content.push(...aiNotesBlock('bilan'));
   /* Comptes enregistrés */
   content.push({text:'',pageBreak:'after'});
   content.push(H2(L('Comptes enregistrés et fiscalité','Registered accounts and taxation')));
@@ -1554,6 +1732,7 @@ function buildDoc(C){
     L('Les cotisations REER et CELIAPP réduisent le revenu familial net rajusté : elles augmentent l’ACE et peuvent augmenter l’Allocation famille et le crédit pour frais de garde. Le taux marginal effectif d’un parent à revenu moyen dépasse donc souvent le taux d’impôt affiché.','RRSP and FHSA contributions lower adjusted family net income: they raise the CCB and can raise the Family Allowance and the childcare credit. A middle-income parent’s effective marginal rate therefore often exceeds the posted tax rate.')
   ];
   content.push({ul:fiscalNotes.map(t=>({text:t,style:'small',margin:[0,0,0,3]})),margin:[0,4,0,0]});
+  content.push(...aiNotesBlock('droits'));
   /* Objectifs et rêves */
   if(C.goals.length){ const sm=C.goalsSummary;
     content.push({text:'',pageBreak:'after'});
@@ -1574,6 +1753,7 @@ function buildDoc(C){
       content.push({stack:[{text:`${g.i}. ${g.title}`,style:'cellL',bold:true,margin:[0,0,0,2]},{text:txt,style:'small',margin:[0,0,0,why?2:6]},...(why?[{text:L('Pourquoi : ','Why: ')+why,style:'small',italics:true,margin:[0,0,0,6]}]:[])]});
     });
     if(C.goals.length>1&&C.goalsNeeded>Math.max(0,C.capacity)) content.push(callout(L(`Arbitrage nécessaire : l’ensemble des objectifs demande ${fmtMoney(C.goalsNeeded)} par mois pour ${fmtMoney(Math.max(0,C.capacity))} de capacité. Financer d’abord les objectifs essentiels, échelonner les autres, et revoir les dates plutôt que d’abandonner les projets.`,`Trade-offs needed: the goals together call for ${fmtMoney(C.goalsNeeded)} per month against ${fmtMoney(Math.max(0,C.capacity))} of capacity. Fund the essential goals first, stagger the others, and revisit dates rather than dropping projects.`),'warn'));
+    content.push(...aiNotesBlock('objectifs'));
     content.push(smallNote(L('Méthode : versement mensuel requis pour atteindre le coût à l’échéance; rendement prudent appliqué au-delà de 3 ans, 0 % en deçà (argent à court terme en liquidités ou CPG). Les coûts sont en dollars d’aujourd’hui : indexer les cibles lointaines.','Method: monthly contribution required to reach the cost by the deadline; conservative return applied beyond 3 years, 0% below (short-term money in cash or GICs). Costs are in today’s dollars: index distant targets.')));
   }
   /* Immobilier */
@@ -1591,6 +1771,7 @@ function buildDoc(C){
     content.push(callout(h.passes?L(`Le projet passe le test de résistance. ${h.diff>0?`La propriété coûte ${fmtMoney(h.diff)} de plus par mois que la location : cet écart doit tenir dans le budget sans sacrifier le REEE ni le fonds d’urgence.`:'Le coût mensuel complet est inférieur ou égal au loyer comparable.'} Résultat sensible à l’appréciation et au rendement alternatif : tester 1 % et 6 %.`,`The project passes the stress test. ${h.diff>0?`Owning costs ${fmtMoney(h.diff)} more per month than renting: that gap must fit in the budget without sacrificing the RESP or the emergency fund.`:'The full monthly cost is at or below the comparable rent.'} The result is sensitive to appreciation and to the alternative return: test 1% and 6%.`):L(`Le projet ne passe pas le test de résistance. Options : viser environ ${fmtMoney(Math.floor(h.maxPrice/5000)*5000)}, augmenter la mise de fonds (CELIAPP des deux parents, RAP), réduire les dettes ou attendre la fin du congé parental.`,`The project fails the stress test. Options: aim for about ${fmtMoney(Math.floor(h.maxPrice/5000)*5000)}, increase the down payment (both parents’ FHSA, HBP), reduce debt or wait until parental leave ends.`),h.passes?'ok':'warn'));
     content.push(smallNote(L(`Droits de mutation 2026 : ${fmtPct(P.dmR1,1)} jusqu’à ${fmtMoney(P.dmT1)}, ${fmtPct(P.dmR2,0)} jusqu’à ${fmtMoney(P.dmT2)}, ${fmtPct(P.dmR3,1)} au-delà, plus les tranches municipales (${has(S.ville)?optK('ville',S.ville):'municipalité'} : vérifier). Mise de fonds minimale : 5 % jusqu’à 500 000 $, 10 % sur l’excédent jusqu’à 1,5 M$, 20 % au-delà.`,`Transfer duties 2026: ${fmtPct(P.dmR1,1)} up to ${fmtMoney(P.dmT1)}, ${fmtPct(P.dmR2,0)} up to ${fmtMoney(P.dmT2)}, ${fmtPct(P.dmR3,1)} above, plus municipal brackets (${has(S.ville)?optK('ville',S.ville):'municipality'}: check). Minimum down payment: 5% up to $500,000, 10% on the excess up to $1.5M, 20% above.`)));
   }
+  if(C.home) content.push(...aiNotesBlock('immobilier'));
   /* Projections */
   content.push({text:'',pageBreak:'after'});
   content.push(H2(L('Projections','Projections')));
@@ -1604,6 +1785,7 @@ function buildDoc(C){
     L(`Tolérance au risque déclarée : ${has(S.tolerance)?optK('tolerance',S.tolerance):'non précisée'}. L’argent nécessaire dans moins de 3 ans (mise de fonds, fonds d’urgence) reste en liquidités ou en CPG; l’horizon de 10 ans et plus se prête à une diversification mondiale à faibles frais, rééquilibrée périodiquement.`,`Declared risk tolerance: ${has(S.tolerance)?optK('tolerance',S.tolerance):'not specified'}. Money needed within 3 years (down payment, emergency fund) stays in cash or GICs; a 10-year-plus horizon suits low-cost global diversification, rebalanced periodically.`),
     L('Éviter de concentrer le portefeuille sur une prévision de crise, un secteur, un pays ou un titre. La discipline des cotisations automatiques compte davantage que le choix du moment.','Avoid concentrating the portfolio on a crisis forecast, a sector, a country or a single stock. The discipline of automatic contributions matters more than timing.')
   ].map(t=>({text:t,style:'small',margin:[0,0,0,3]}))});
+  content.push(...aiNotesBlock('projections'));
   /* Protection */
   content.push({text:'',pageBreak:'after'});
   content.push(H2(L('Protection, succession et cadre juridique','Protection, estate and legal framework')));
@@ -1620,6 +1802,7 @@ function buildDoc(C){
     L('Documents à conserver ensemble : certificat de naissance, NAS de l’enfant, contrats d’assurance, testaments et mandats, relevés des comptes enregistrés, mots de passe gérés dans un gestionnaire sécurisé avec accès d’urgence.','Documents to keep together: birth certificate, the child’s SIN, insurance contracts, wills and mandates, registered account statements, passwords kept in a secure manager with emergency access.')
   ];
   content.push({ul:legal.map(t=>({text:t,style:'small',margin:[0,0,0,4]}))});
+  content.push(...aiNotesBlock('protection'));
   /* Feuille de route */
   content.push({text:'',pageBreak:'after'});
   content.push(H2(L('Feuille de route de 12 mois','12-month roadmap')));
@@ -1631,6 +1814,8 @@ function buildDoc(C){
   if(notes.length) content.push({columns:[{width:'*',stack:actions},{width:'*',stack:notes}],columnGap:18}); else content.push({stack:actions});
   content.push(H3(L('Cibles annuelles du plan','Annual plan targets')));
   content.push(twoCol([[L(`Fonds d’urgence visé (${C.emergencyTarget} mois)`,`Emergency fund target (${C.emergencyTarget} months)`),fmtMoney(C.emergencyTargetAmt)],[L('Épargne automatique mensuelle, hors cotisations','Automatic monthly savings, excluding contributions'),fmtMoney(num(S.epargneAuto))],[`${L('CELIAPP','FHSA')} ${A}${couple?` / ${B}`:''}`,couple?`${fmtMoney(num(S.versCeliappA))} / ${fmtMoney(num(S.versCeliappB))}`:fmtMoney(num(S.versCeliappA))],[`${L('REER','RRSP')} ${A}${couple?` / ${B}`:''}`,couple?`${fmtMoney(num(S.versReerA))} / ${fmtMoney(num(S.versReerB))}`:fmtMoney(num(S.versReerA))],[`${L('CELI','TFSA')} ${A}${couple?` / ${B}`:''}`,couple?`${fmtMoney(num(S.versCeliA))} / ${fmtMoney(num(S.versCeliB))}`:fmtMoney(num(S.versCeliA))],...(C.kids>0?[[L('REEE (tous les enfants)','RESP (all children)'),fmtMoney(num(S.versReee))]]:[]),[L('Remboursement de dettes additionnel (mensuel)','Extra debt repayment (monthly)'),fmtMoney(num(S.remboursementSupp))],[L(`Salaire cible, ${A}`,`Target salary, ${A}`),fmtMoney(num(S.salaireCibleA))],...(couple?[[L(`Salaire cible, ${B}`,`Target salary, ${B}`),fmtMoney(num(S.salaireCibleB))]]:[]),...(C.side?[[L('Revenu secondaire brut visé','Target gross side income'),fmtMoney(C.side.gross)]]:[]),[L('Total annuel des cotisations et remboursements','Total annual contributions and repayments'),fmtMoney(C.contribAnnual),true],[L('Capacité d’épargne annuelle selon le budget','Annual savings capacity from the budget'),fmtMoney(C.capacity*12),true]]));
+  content.push(...aiNotesBlock('revenus'));
+  content.push(...aiNotesBlock('plan'));
   /* Hypothèses */
   content.push({text:'',pageBreak:'after'});
   content.push(H2(L('Hypothèses, paramètres 2026 et sources','Assumptions, 2026 parameters and sources')));
@@ -1744,7 +1929,7 @@ function closeDrawer(id){ const d=document.getElementById(id); if(d) d.classList
 
 /* Export / import / effacement */
 function exportJSON(){ const data={app:'planfam2026',version:2,lang:LANG,exported:new Date().toISOString(),answers:S,params:P}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`${L('plan-financier-reponses','financial-plan-answers')}-${todayISO()}.json`; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},3000); toast(L('Réponses exportées','Answers exported')); }
-function importJSON(file){ const r=new FileReader(); r.onload=()=>{ try{ const d=JSON.parse(r.result); const answers=d.answers||d; if(typeof answers!=='object') throw new Error('format'); S={}; Object.keys(answers).forEach(k=>{ if(FIELD_BY_KEY[k]) S[k]=answers[k]; }); if(d.params&&typeof d.params==='object') Object.keys(d.params).forEach(k=>{ if(k in P) P[k]=d.params[k]; }); applyDefaults(); save(); C=compute(); renderParams(); go(current); renderDash(); toast(L('Réponses importées','Answers imported')); }catch(e){ toast(L('Fichier non reconnu','File not recognized')); } }; r.readAsText(file); }
+function importJSON(file){ const r=new FileReader(); r.onload=()=>{ try{ const d=JSON.parse(r.result); const answers=d.answers||d; if(typeof answers!=='object') throw new Error('format'); S={}; Object.keys(answers).forEach(k=>{ if(FIELD_BY_KEY[k]||k==='aiNotes'||k==='aiAnalysis') S[k]=answers[k]; }); if(d.params&&typeof d.params==='object') Object.keys(d.params).forEach(k=>{ if(k in P) P[k]=d.params[k]; }); applyDefaults(); save(); C=compute(); renderParams(); go(current); renderDash(); toast(L('Réponses importées','Answers imported')); }catch(e){ toast(L('Fichier non reconnu','File not recognized')); } }; r.readAsText(file); }
 function resetAll(){ if(!confirm(L('Effacer toutes vos réponses enregistrées sur cet appareil ? Cette action est irréversible.','Erase all answers saved on this device? This cannot be undone.'))) return; S={}; try{ localStorage.removeItem(STORE_KEY);}catch(e){} save(); C=compute(); go(0); renderDash(); toast(L('Données effacées','Data erased')); }
 function copyMandate(){ const payload=mandateText()+'\n\n'+L('Données du ménage (JSON) :','Household data (JSON):')+'\n'+JSON.stringify({...S,planName:undefined,prenomA:undefined,prenomB:undefined},null,2); const done=()=>toast(L('Mandat et données copiés','Mandate and data copied')); if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(payload).then(done).catch(()=>fallbackCopy(payload,done)); } else fallbackCopy(payload,done); }
 function fallbackCopy(text,done){ const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(e){ toast(L('Copie impossible : sélectionnez le texte manuellement','Copy failed: select the text manually')); } ta.remove(); }
@@ -1757,11 +1942,16 @@ document.addEventListener('click',e=>{
   if(e.target.closest('[data-next-missing]')){ nextMissing(); return; }
   const cl=e.target.closest('[data-close]'); if(cl){ closeDrawer(cl.dataset.close); return; }
   const agq=e.target.closest('[data-ag-q]'); if(agq){ agentAsk(agq.dataset.agQ); return; }
+  const ain=e.target.closest('[data-ai-note]'); if(ain){ aiNote(ain.dataset.aiNote); return; }
+  if(e.target.closest('[data-ai-eye]')){ AI.showKey=!AI.showKey; renderSection(); return; }
   const aga=e.target.closest('[data-ag-action]'); if(aga){ agentAction(aga.dataset.agAction); return; }
   const id=e.target.closest('button')&&e.target.closest('button').id;
   if(id==='agentFab'||e.target.closest('#agentFab')){ agentOpen(!AG.open); return; }
   if(id==='agentClose'){ agentOpen(false); return; }
-  if(id==='btnParams'){ renderParams(); openDrawer('paramsDrawer'); }
+  if(id==='btnAiTest'){ aiTest(); }
+  else if(id==='btnAiForget'){ aiForget(); renderSection(); agentRender(); toast(L('Clé oubliée','Key forgotten')); }
+  else if(id==='btnAiAnalysis'){ aiAnalysis(); }
+  else if(id==='btnParams'){ renderParams(); openDrawer('paramsDrawer'); }
   else if(id==='btnDash'){ openDrawer('dashDrawer'); }
   else if(id==='btnLang'){ setLang(LANG==='en'?'fr':'en'); }
   else if(id==='btnTheme'){ applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'); renderLive(); renderDash(); }
@@ -1773,14 +1963,15 @@ document.addEventListener('click',e=>{
   else if(id==='btnReset'){ resetAll(); }
   else if(id==='btnMandate'){ copyMandate(); }
 });
-document.addEventListener('input',e=>{ if(e.target.dataset&&e.target.dataset.p) onParamInput(e); else onInput(e); });
-document.addEventListener('change',e=>{ if(e.target.id==='fileImport'&&e.target.files[0]){ importJSON(e.target.files[0]); e.target.value=''; return; } if(e.target.dataset&&e.target.dataset.k){ onInput(e); } });
+function onAiInput(e){ const el=e.target; const k=el.dataset.ai; if(k==='provider'){ AI.provider=el.value; AI.model=''; AI.tested=null; AI.testedMsg=''; aiSave(); renderSection(); agentRender(); return; } if(k==='modelSelect'){ if(el.value==='__custom'){ AI.model='__custom'; aiSave(); renderSection(); const c=document.getElementById('ai_model_custom'); if(c){ c.value=''; AI.model=''; c.focus(); } } else { AI.model=el.value; AI.tested=null; aiSave(); renderSection(); } return; } if(k==='model'){ AI.model=el.value.trim(); AI.tested=null; aiSave(); return; } if(k==='key'){ AI.key=el.value.trim(); AI.tested=null; aiSave(); const b=document.getElementById('btnAiTest'); if(b) b.disabled=!aiReady(); const f=document.getElementById('btnAiForget'); if(f) f.disabled=!AI.key; return; } if(['remember','consent','chat','notes','analysis'].includes(k)){ AI[k]=!!el.checked; aiSave(); if(k==='consent'||k==='remember'){ renderSection(); } agentRender(); return; } }
+document.addEventListener('input',e=>{ if(e.target.dataset&&e.target.dataset.ai) onAiInput(e); else if(e.target.dataset&&e.target.dataset.p) onParamInput(e); else onInput(e); });
+document.addEventListener('change',e=>{ if(e.target.id==='fileImport'&&e.target.files[0]){ importJSON(e.target.files[0]); e.target.value=''; return; } if(e.target.dataset&&e.target.dataset.ai){ if(e.target.type==='checkbox'||e.target.tagName==='SELECT') onAiInput(e); return; } if(e.target.dataset&&e.target.dataset.k){ onInput(e); } });
 document.addEventListener('focusout',onBlurNumeric);
 document.addEventListener('focusin',onFocusNumeric);
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeDrawer('dashDrawer'); closeDrawer('paramsDrawer'); } });
 document.addEventListener('submit',e=>{ if(e.target.id==='agentForm'){ e.preventDefault(); const i=document.getElementById('agentInput'); const q=i.value; i.value=''; agentAsk(q); } });
 
-initLang(); initTheme(); load(); applyStaticTexts(); C=compute(); renderSection(); renderRail(); renderDash();
+initLang(); initTheme(); load(); aiLoad(); applyStaticTexts(); C=compute(); renderSection(); renderRail(); renderDash();
 document.getElementById('agentFab').insertAdjacentHTML('afterbegin',beaverSVG(42)); document.getElementById('agentHeadAva').innerHTML=beaverSVG(40); agentRender();
 </script>
 </body>
